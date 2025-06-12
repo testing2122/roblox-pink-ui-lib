@@ -14,6 +14,7 @@ local clrs = {
     secondary = Color3.fromRGB(12, 12, 15),
     accent = Color3.fromRGB(20, 20, 25),
     pink = Color3.fromRGB(255, 105, 180),
+    red = Color3.fromRGB(255, 80, 80),
     darkpink = Color3.fromRGB(200, 80, 140),
     lightpink = Color3.fromRGB(255, 150, 200),
     white = Color3.fromRGB(255, 255, 255),
@@ -54,10 +55,10 @@ function pnkui:CreateWindow(cfg)
     -- // main frame with transparency
     local main = Instance.new("Frame");
     main.Name = "Main";
-    main.Size = UDim2.new(0, 850, 0, 600);
-    main.Position = UDim2.new(0.5, -425, 0.5, -300);
+    main.Size = UDim2.new(0, 900, 0, 650);
+    main.Position = UDim2.new(0.5, -450, 0.5, -325);
     main.BackgroundColor3 = clrs.bg;
-    main.BackgroundTransparency = 0.08;
+    main.BackgroundTransparency = 0.05;
     main.BorderSizePixel = 0;
     main.Parent = gui;
     
@@ -116,20 +117,20 @@ function pnkui:CreateWindow(cfg)
     gradfix2.Rotation = 0;
     gradfix2.Parent = gradfix;
     
-    -- // title bar (transparent)
+    -- // title bar
     local titlebar = Instance.new("Frame");
     titlebar.Name = "TitleBar";
-    titlebar.Size = UDim2.new(1, 0, 0, 60);
+    titlebar.Size = UDim2.new(1, 0, 0, 70);
     titlebar.Position = UDim2.new(0, 0, 0, 0);
     titlebar.BackgroundTransparency = 1;
     titlebar.BorderSizePixel = 0;
     titlebar.Parent = main;
     
-    -- // title text with glow effect
+    -- // title text
     local titlelbl = Instance.new("TextLabel");
     titlelbl.Name = "Title";
     titlelbl.Size = UDim2.new(1, -120, 0, 30);
-    titlelbl.Position = UDim2.new(0, 25, 0, 12);
+    titlelbl.Position = UDim2.new(0, 25, 0, 15);
     titlelbl.BackgroundTransparency = 1;
     titlelbl.Text = title;
     titlelbl.TextColor3 = clrs.white;
@@ -142,7 +143,7 @@ function pnkui:CreateWindow(cfg)
     local subtitlelbl = Instance.new("TextLabel");
     subtitlelbl.Name = "Subtitle";
     subtitlelbl.Size = UDim2.new(1, -120, 0, 18);
-    subtitlelbl.Position = UDim2.new(0, 25, 0, 35);
+    subtitlelbl.Position = UDim2.new(0, 25, 0, 38);
     subtitlelbl.BackgroundTransparency = 1;
     subtitlelbl.Text = subtitle;
     subtitlelbl.TextColor3 = clrs.grey;
@@ -155,7 +156,7 @@ function pnkui:CreateWindow(cfg)
     local minbtn = Instance.new("TextButton");
     minbtn.Name = "Minimize";
     minbtn.Size = UDim2.new(0, 35, 0, 35);
-    minbtn.Position = UDim2.new(1, -85, 0, 12.5);
+    minbtn.Position = UDim2.new(1, -85, 0, 17.5);
     minbtn.BackgroundColor3 = clrs.accent;
     minbtn.BackgroundTransparency = 0.7;
     minbtn.BorderSizePixel = 0;
@@ -173,8 +174,8 @@ function pnkui:CreateWindow(cfg)
     local closebtn = Instance.new("TextButton");
     closebtn.Name = "Close";
     closebtn.Size = UDim2.new(0, 35, 0, 35);
-    closebtn.Position = UDim2.new(1, -45, 0, 12.5);
-    closebtn.BackgroundColor3 = Color3.fromRGB(255, 80, 80);
+    closebtn.Position = UDim2.new(1, -45, 0, 17.5);
+    closebtn.BackgroundColor3 = clrs.red;
     closebtn.BackgroundTransparency = 0.7;
     closebtn.BorderSizePixel = 0;
     closebtn.Text = "✕";
@@ -187,11 +188,33 @@ function pnkui:CreateWindow(cfg)
     closecorner.CornerRadius = UDim.new(0, 8);
     closecorner.Parent = closebtn;
     
+    -- // top separator line
+    local topsep = Instance.new("Frame");
+    topsep.Name = "TopSeparator";
+    topsep.Size = UDim2.new(1, -50, 0, 2);
+    topsep.Position = UDim2.new(0, 25, 0, 68);
+    topsep.BackgroundColor3 = clrs.red;
+    topsep.BorderSizePixel = 0;
+    topsep.Parent = main;
+    
+    local topsepgrad = Instance.new("UIGradient");
+    topsepgrad.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, clrs.red),
+        ColorSequenceKeypoint.new(0.5, clrs.pink),
+        ColorSequenceKeypoint.new(1, clrs.red)
+    };
+    topsepgrad.Rotation = 0;
+    topsepgrad.Parent = topsep;
+    
+    local topsepcorner = Instance.new("UICorner");
+    topsepcorner.CornerRadius = UDim.new(0, 1);
+    topsepcorner.Parent = topsep;
+    
     -- // sidebar with scrolling
     local sidebar = Instance.new("Frame");
     sidebar.Name = "Sidebar";
-    sidebar.Size = UDim2.new(0, 220, 1, -75);
-    sidebar.Position = UDim2.new(0, 15, 0, 70);
+    sidebar.Size = UDim2.new(0, 220, 1, -85);
+    sidebar.Position = UDim2.new(0, 15, 0, 80);
     sidebar.BackgroundTransparency = 1;
     sidebar.BorderSizePixel = 0;
     sidebar.Parent = main;
@@ -223,11 +246,11 @@ function pnkui:CreateWindow(cfg)
     tabpad.PaddingBottom = UDim.new(0, 8);
     tabpad.Parent = tabcont;
     
-    -- // content area
+    -- // content area with grid layout
     local content = Instance.new("Frame");
     content.Name = "Content";
-    content.Size = UDim2.new(1, -255, 1, -85);
-    content.Position = UDim2.new(0, 245, 0, 75);
+    content.Size = UDim2.new(1, -265, 1, -95);
+    content.Position = UDim2.new(0, 255, 0, 85);
     content.BackgroundTransparency = 1;
     content.BorderSizePixel = 0;
     content.Parent = main;
@@ -235,8 +258,8 @@ function pnkui:CreateWindow(cfg)
     -- // vertical separator
     local separator = Instance.new("Frame");
     separator.Name = "VerticalSeparator";
-    separator.Size = UDim2.new(0, 1, 1, -75);
-    separator.Position = UDim2.new(0, 235, 0, 70);
+    separator.Size = UDim2.new(0, 1, 1, -85);
+    separator.Position = UDim2.new(0, 245, 0, 80);
     separator.BackgroundColor3 = clrs.separator;
     separator.BorderSizePixel = 0;
     separator.BackgroundTransparency = 0.5;
@@ -305,7 +328,7 @@ function pnkui:CreateWindow(cfg)
         local name = cfg.Name or "Tab";
         local icon = cfg.Icon or "";
         
-        -- // tab button (no background)
+        -- // tab button
         local tabbtn = Instance.new("TextButton");
         tabbtn.Name = name;
         tabbtn.Size = UDim2.new(1, 0, 0, 45);
@@ -314,7 +337,7 @@ function pnkui:CreateWindow(cfg)
         tabbtn.Text = "";
         tabbtn.Parent = tabcont;
         
-        -- // tab icon (if provided)
+        -- // tab icon
         local iconlbl = nil;
         if icon ~= "" then
             iconlbl = Instance.new("TextLabel");
@@ -343,7 +366,7 @@ function pnkui:CreateWindow(cfg)
         -- // get text bounds for underline width
         local textbounds = game:GetService("TextService"):GetTextSize(name, 15, Enum.Font.GothamMedium, Vector2.new(200, 50));
         
-        -- // pink underline for selected tab (matches text width)
+        -- // pink underline for selected tab
         local underline = Instance.new("Frame");
         underline.Name = "Underline";
         underline.Size = UDim2.new(0, 0, 0, 3);
@@ -356,7 +379,7 @@ function pnkui:CreateWindow(cfg)
         undercorner.CornerRadius = UDim.new(0, 2);
         undercorner.Parent = underline;
         
-        -- // hover underline (matches text width)
+        -- // hover underline
         local hoverline = Instance.new("Frame");
         hoverline.Name = "HoverLine";
         hoverline.Size = UDim2.new(0, 0, 0, 2);
@@ -369,7 +392,7 @@ function pnkui:CreateWindow(cfg)
         hovercorner.CornerRadius = UDim.new(0, 1);
         hovercorner.Parent = hoverline;
         
-        -- // tab content with better styling
+        -- // tab content with grid layout
         local tabcontent = Instance.new("ScrollingFrame");
         tabcontent.Name = name .. "Content";
         tabcontent.Size = UDim2.new(1, 0, 1, 0);
@@ -384,16 +407,18 @@ function pnkui:CreateWindow(cfg)
         tabcontent.Visible = false;
         tabcontent.Parent = content;
         
-        local contentlayout = Instance.new("UIListLayout");
-        contentlayout.SortOrder = Enum.SortOrder.LayoutOrder;
-        contentlayout.Padding = UDim.new(0, 12);
-        contentlayout.Parent = tabcontent;
+        -- // grid layout for sections
+        local gridlayout = Instance.new("UIGridLayout");
+        gridlayout.CellSize = UDim2.new(0, 300, 0, 250);
+        gridlayout.CellPadding = UDim2.new(0, 15, 0, 15);
+        gridlayout.SortOrder = Enum.SortOrder.LayoutOrder;
+        gridlayout.Parent = tabcontent;
         
         local contentpad = Instance.new("UIPadding");
-        contentpad.PaddingLeft = UDim.new(0, 20);
-        contentpad.PaddingRight = UDim.new(0, 20);
-        contentpad.PaddingTop = UDim.new(0, 20);
-        contentpad.PaddingBottom = UDim.new(0, 20);
+        contentpad.PaddingLeft = UDim.new(0, 15);
+        contentpad.PaddingRight = UDim.new(0, 15);
+        contentpad.PaddingTop = UDim.new(0, 15);
+        contentpad.PaddingBottom = UDim.new(0, 15);
         contentpad.Parent = tabcontent;
         
         -- // tab functionality
@@ -461,52 +486,60 @@ function pnkui:CreateWindow(cfg)
         -- // tab methods
         local tabmethods = {};
         
-        function tabmethods:AddSeparator(text)
-            local sep = Instance.new("Frame");
-            sep.Name = "Separator";
-            sep.Size = UDim2.new(1, 0, 0, 35);
-            sep.BackgroundTransparency = 1;
-            sep.Parent = tabcontent;
+        function tabmethods:CreateSection(sectionname)
+            local section = Instance.new("Frame");
+            section.Name = sectionname;
+            section.Size = UDim2.new(1, 0, 1, 0);
+            section.BackgroundColor3 = clrs.secondary;
+            section.BackgroundTransparency = 0.1;
+            section.BorderSizePixel = 0;
+            section.Parent = tabcontent;
             
-            if text then
-                local seplbl = Instance.new("TextLabel");
-                seplbl.Size = UDim2.new(1, 0, 0, 25);
-                seplbl.Position = UDim2.new(0, 0, 0, 0);
-                seplbl.BackgroundTransparency = 1;
-                seplbl.Text = text;
-                seplbl.TextColor3 = clrs.lightpink;
-                seplbl.TextSize = 14;
-                seplbl.Font = Enum.Font.GothamBold;
-                seplbl.TextXAlignment = Enum.TextXAlignment.Left;
-                seplbl.Parent = sep;
-            end;
+            local sectioncorner = Instance.new("UICorner");
+            sectioncorner.CornerRadius = UDim.new(0, 12);
+            sectioncorner.Parent = section;
             
-            local sepline = Instance.new("Frame");
-            sepline.Size = UDim2.new(1, 0, 0, 2);
-            sepline.Position = UDim2.new(0, 0, 1, -8);
-            sepline.BackgroundTransparency = 1;
-            sepline.BorderSizePixel = 0;
-            sepline.Parent = sep;
+            local sectionstroke = Instance.new("UIStroke");
+            sectionstroke.Color = clrs.red;
+            sectionstroke.Thickness = 2;
+            sectionstroke.Transparency = 0.3;
+            sectionstroke.Parent = section;
             
-            local sepgrad = Instance.new("UIGradient");
-            sepgrad.Color = ColorSequence.new{
-                ColorSequenceKeypoint.new(0, clrs.pink),
-                ColorSequenceKeypoint.new(0.5, clrs.separator),
-                ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))
-            };
-            sepgrad.Transparency = NumberSequence.new{
-                NumberSequenceKeypoint.new(0, 0.3),
-                NumberSequenceKeypoint.new(0.7, 0.8),
-                NumberSequenceKeypoint.new(1, 1)
-            };
-            sepgrad.Rotation = 0;
-            sepgrad.Parent = sepline;
+            -- // section title
+            local sectiontitle = Instance.new("TextLabel");
+            sectiontitle.Size = UDim2.new(1, -20, 0, 30);
+            sectiontitle.Position = UDim2.new(0, 10, 0, 10);
+            sectiontitle.BackgroundTransparency = 1;
+            sectiontitle.Text = sectionname;
+            sectiontitle.TextColor3 = clrs.lightpink;
+            sectiontitle.TextSize = 16;
+            sectiontitle.Font = Enum.Font.GothamBold;
+            sectiontitle.TextXAlignment = Enum.TextXAlignment.Left;
+            sectiontitle.Parent = section;
             
-            sepline.BackgroundColor3 = clrs.pink;
+            -- // section content
+            local sectioncontent = Instance.new("ScrollingFrame");
+            sectioncontent.Size = UDim2.new(1, -20, 1, -50);
+            sectioncontent.Position = UDim2.new(0, 10, 0, 40);
+            sectioncontent.BackgroundTransparency = 1;
+            sectioncontent.BorderSizePixel = 0;
+            sectioncontent.ScrollBarThickness = 2;
+            sectioncontent.ScrollBarImageColor3 = clrs.pink;
+            sectioncontent.ScrollBarImageTransparency = 0.8;
+            sectioncontent.CanvasSize = UDim2.new(0, 0, 0, 0);
+            sectioncontent.AutomaticCanvasSize = Enum.AutomaticSize.Y;
+            sectioncontent.Parent = section;
             
-            local sepcorner = Instance.new("UICorner");
-            sepcorner.CornerRadius = UDim.new(0, 1);
-            sepcorner.Parent = sepline;
+            local sectionlayout = Instance.new("UIListLayout");
+            sectionlayout.SortOrder = Enum.SortOrder.LayoutOrder;
+            sectionlayout.Padding = UDim.new(0, 8);
+            sectionlayout.Parent = sectioncontent;
+            
+            local sectionpad = Instance.new("UIPadding");
+            sectionpad.PaddingAll = UDim.new(0, 5);
+            sectionpad.Parent = sectioncontent;
+            
+            return sectioncontent;
         end;
         
         return tabmethods;
