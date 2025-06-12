@@ -178,6 +178,7 @@ function pnkui:CreateWindow(cfg)
     tabpad.PaddingLeft = UDim.new(0, 8);
     tabpad.PaddingRight = UDim.new(0, 8);
     tabpad.PaddingTop = UDim.new(0, 5);
+    tabpad.PaddingBottom = UDim.new(0, 5);
     tabpad.Parent = tabcont;
     
     -- // content area
@@ -308,7 +309,10 @@ function pnkui:CreateWindow(cfg)
         contentlayout.Parent = tabcontent;
         
         local contentpad = Instance.new("UIPadding");
-        contentpad.PaddingAll = UDim.new(0, 15);
+        contentpad.PaddingLeft = UDim.new(0, 15);
+        contentpad.PaddingRight = UDim.new(0, 15);
+        contentpad.PaddingTop = UDim.new(0, 15);
+        contentpad.PaddingBottom = UDim.new(0, 15);
         contentpad.Parent = tabcontent;
         
         -- // tab functionality
