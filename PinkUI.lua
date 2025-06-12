@@ -105,7 +105,7 @@ function pnkui:CreateWindow(cfg)
         titlegrad.Color = ColorSequence.new{
             ColorSequenceKeypoint.new(0, clrs.pink),
             ColorSequenceKeypoint.new(0.5, clrs.lightpink),
-            ColorSequence.KeyPoint.new(1, clrs.pink)
+            ColorSequenceKeypoint.new(1, clrs.pink)
         };
         titlegrad.Offset = Vector2.new(-1, 0);
         titlegrad.Parent = titlelbl;
@@ -153,7 +153,7 @@ function pnkui:CreateWindow(cfg)
                 titlegrad.Color = ColorSequence.new{
                     ColorSequenceKeypoint.new(0, clrs.pink),
                     ColorSequenceKeypoint.new(0.5, clrs.lightpink),
-                    ColorSequence.KeyPoint.new(1, clrs.pink)
+                    ColorSequenceKeypoint.new(1, clrs.pink)
                 };
                 titlegrad.Offset = Vector2.new(-1, 0);
             end;
