@@ -28,6 +28,36 @@ local function createtween(obj, info, props)
     return tweenserv:Create(obj, info, props);
 end;
 
+-- // add separator function
+function components:AddSeparator(parent, cfg)
+    local cfg = cfg or {};
+    local height = cfg.Height or 15;
+    local color = cfg.Color or clrs.separator;
+    local transparency = cfg.Transparency or 0;
+    
+    local sepframe = Instance.new("Frame");
+    sepframe.Name = "Separator";
+    sepframe.Size = UDim2.new(1, 0, 0, height);
+    sepframe.BackgroundTransparency = 1;
+    sepframe.BorderSizePixel = 0;
+    sepframe.LayoutOrder = #parent:GetChildren();
+    sepframe.Parent = parent;
+    
+    local sepline = Instance.new("Frame");
+    sepline.Size = UDim2.new(1, -20, 0, 1);
+    sepline.Position = UDim2.new(0, 10, 0.5, 0);
+    sepline.BackgroundColor3 = color;
+    sepline.BackgroundTransparency = transparency;
+    sepline.BorderSizePixel = 0;
+    sepline.Parent = sepframe;
+    
+    local sepcorner = Instance.new("UICorner");
+    sepcorner.CornerRadius = UDim.new(0, 1);
+    sepcorner.Parent = sepline;
+    
+    return sepframe;
+end;
+
 -- // add components to box content
 function components:AddToggle(parent, cfg)
     local cfg = cfg or {};
@@ -35,6 +65,7 @@ function components:AddToggle(parent, cfg)
     local desc = cfg.Description or "";
     local default = cfg.Default or false;
     local callback = cfg.Callback or function() end;
+    local separator = cfg.Separator;
     
     local toggleframe = Instance.new("Frame");
     toggleframe.Name = name;
@@ -111,6 +142,11 @@ function components:AddToggle(parent, cfg)
         callback(enabled);
     end);
     
+    -- // add separator if requested
+    if separator then
+        self:AddSeparator(parent, separator == true and {} or separator);
+    end;
+    
     return {
         SetValue = function(value)
             enabled = value;
@@ -133,6 +169,7 @@ function components:AddButton(parent, cfg)
     local name = cfg.Name or "Button";
     local desc = cfg.Description or "";
     local callback = cfg.Callback or function() end;
+    local separator = cfg.Separator;
     
     local btnframe = Instance.new("Frame");
     btnframe.Name = name;
@@ -208,6 +245,11 @@ function components:AddButton(parent, cfg)
         callback();
     end);
     
+    -- // add separator if requested
+    if separator then
+        self:AddSeparator(parent, separator == true and {} or separator);
+    end;
+    
     return btn;
 end;
 
@@ -220,6 +262,7 @@ function components:AddSlider(parent, cfg)
     local default = cfg.Default or min;
     local increment = cfg.Increment or 1;
     local callback = cfg.Callback or function() end;
+    local separator = cfg.Separator;
     
     local sliderframe = Instance.new("Frame");
     sliderframe.Name = name;
@@ -338,6 +381,11 @@ function components:AddSlider(parent, cfg)
         end;
     end);
     
+    -- // add separator if requested
+    if separator then
+        self:AddSeparator(parent, separator == true and {} or separator);
+    end;
+    
     return {
         SetValue = function(newvalue)
             value = math.clamp(newvalue, min, max);
@@ -359,6 +407,7 @@ function components:AddInput(parent, cfg)
     local placeholder = cfg.Placeholder or "Enter text...";
     local default = cfg.Default or "";
     local callback = cfg.Callback or function() end;
+    local separator = cfg.Separator;
     
     local inputframe = Instance.new("Frame");
     inputframe.Name = name;
@@ -428,6 +477,11 @@ function components:AddInput(parent, cfg)
         callback(inputbox.Text);
     end);
     
+    -- // add separator if requested
+    if separator then
+        self:AddSeparator(parent, separator == true and {} or separator);
+    end;
+    
     return {
         SetValue = function(text)
             inputbox.Text = text;
@@ -445,6 +499,7 @@ function components:AddDropdown(parent, cfg)
     local options = cfg.Options or {"Option 1", "Option 2"};
     local default = cfg.Default or options[1];
     local callback = cfg.Callback or function() end;
+    local separator = cfg.Separator;
     
     local dropframe = Instance.new("Frame");
     dropframe.Name = name;
@@ -624,6 +679,11 @@ function components:AddDropdown(parent, cfg)
         end;
     end);
     
+    -- // add separator if requested
+    if separator then
+        self:AddSeparator(parent, separator == true and {} or separator);
+    end;
+    
     return {
         SetValue = function(option)
             if table.find(options, option) then
@@ -718,6 +778,7 @@ function components:AddLabel(parent, cfg)
     local text = cfg.Text or "Label";
     local size = cfg.Size or 14;
     local color = cfg.Color or clrs.white;
+    local separator = cfg.Separator;
     
     local labelframe = Instance.new("Frame");
     labelframe.Size = UDim2.new(1, 0, 0, size + 10);
@@ -737,6 +798,11 @@ function components:AddLabel(parent, cfg)
     label.TextXAlignment = Enum.TextXAlignment.Left;
     label.TextWrapped = true;
     label.Parent = labelframe;
+    
+    -- // add separator if requested
+    if separator then
+        self:AddSeparator(parent, separator == true and {} or separator);
+    end;
     
     return {
         SetText = function(newtext)
