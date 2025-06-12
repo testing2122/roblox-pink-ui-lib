@@ -144,7 +144,7 @@ function components:AddToggle(parent, cfg)
     };
 end;
 
--- // BUTTON
+-- // BUTTON (fixed hover state bug)
 function components:AddButton(parent, cfg)
     local cfg = cfg or {};
     local text = cfg.Text or "Button";
@@ -191,24 +191,44 @@ function components:AddButton(parent, cfg)
         desclbl.Parent = btnframe;
     end;
     
-    -- // effects
+    local ishovered = false;
+    local ispressed = false;
+    
+    -- // fixed hover effects to prevent stuck states
     btn.MouseEnter:Connect(function()
-        createtween(btn, twinfo.fast, {BackgroundColor3 = clrs.secondary}):Play();
-        createtween(btnstroke, twinfo.fast, {Transparency = 0.4}):Play();
+        ishovered = true;
+        if not ispressed then
+            createtween(btn, twinfo.fast, {BackgroundColor3 = clrs.secondary}):Play();
+            createtween(btnstroke, twinfo.fast, {Transparency = 0.4}):Play();
+        end;
     end);
     
     btn.MouseLeave:Connect(function()
-        createtween(btn, twinfo.fast, {BackgroundColor3 = clrs.accent}):Play();
-        createtween(btnstroke, twinfo.fast, {Transparency = 0.8}):Play();
+        ishovered = false;
+        if not ispressed then
+            createtween(btn, twinfo.fast, {BackgroundColor3 = clrs.accent}):Play();
+            createtween(btnstroke, twinfo.fast, {Transparency = 0.8}):Play();
+        end;
     end);
     
     btn.MouseButton1Down:Connect(function()
+        ispressed = true;
         createtween(btn, twinfo.fast, {BackgroundColor3 = clrs.pink}):Play();
+        createtween(btnstroke, twinfo.fast, {Transparency = 0.2}):Play();
     end);
     
     btn.MouseButton1Up:Connect(function()
-        createtween(btn, twinfo.fast, {BackgroundColor3 = clrs.secondary}):Play();
+        ispressed = false;
         callback();
+        
+        -- // proper state restoration
+        if ishovered then
+            createtween(btn, twinfo.fast, {BackgroundColor3 = clrs.secondary}):Play();
+            createtween(btnstroke, twinfo.fast, {Transparency = 0.4}):Play();
+        else
+            createtween(btn, twinfo.fast, {BackgroundColor3 = clrs.accent}):Play();
+            createtween(btnstroke, twinfo.fast, {Transparency = 0.8}):Play();
+        end;
     end);
     
     return {
@@ -512,6 +532,9 @@ function components:AddLabel(parent, cfg)
     return {
         SetText = function(newtext)
             mainlbl.Text = newtext;
+        end,
+        SetColor = function(color)
+            mainlbl.TextColor3 = color;
         end
     };
 end;
