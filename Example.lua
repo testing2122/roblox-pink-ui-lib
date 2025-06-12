@@ -1,4 +1,4 @@
--- // Pink UI Library Example with Box System
+-- // Pink UI Library Example with Box System and Separators
 -- // Load the libraries
 local PinkUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/testing2122/roblox-pink-ui-lib/main/PinkUI.lua"))();
 local Components = loadstring(game:HttpGet("https://raw.githubusercontent.com/testing2122/roblox-pink-ui-lib/main/Components.lua"))();
@@ -31,33 +31,34 @@ local ExtraTab = Window:CreateTab({
 local CombatBox = MainTab:CreateBox({
     Name = "Combat Features",
     Column = "left",
-    Height = 250
+    Height = 300
 });
 
 local MovementBox = MainTab:CreateBox({
     Name = "Movement",
     Column = "left", 
-    Height = 200
+    Height = 250
 });
 
 -- // Right column boxes
 local VisualsBox = MainTab:CreateBox({
     Name = "Visuals",
     Column = "right",
-    Height = 300
+    Height = 350
 });
 
 local MiscBox = MainTab:CreateBox({
     Name = "Miscellaneous",
     Column = "right",
-    Height = 150
+    Height = 200
 });
 
--- // Add components to Combat box
+-- // Add components to Combat box WITH SEPARATORS
 Components:AddToggle(CombatBox, {
     Name = "Auto Attack",
     Description = "Automatically attack nearby enemies",
     Default = false,
+    Separator = true, -- Add separator after this component
     Callback = function(value)
         print("Auto Attack:", value);
     end
@@ -70,6 +71,7 @@ Components:AddSlider(CombatBox, {
     Max = 50,
     Default = 10,
     Increment = 1,
+    Separator = true, -- Add separator after this component
     Callback = function(value)
         print("Attack Range:", value);
     end
@@ -85,11 +87,16 @@ Components:AddDropdown(CombatBox, {
     end
 });
 
--- // Add components to Movement box
+-- // Add components to Movement box WITH CUSTOM SEPARATORS
 Components:AddToggle(MovementBox, {
     Name = "Speed Boost",
     Description = "Increase movement speed",
     Default = false,
+    Separator = {
+        Height = 20,
+        Color = Color3.fromRGB(255, 105, 180),
+        Transparency = 0.3
+    },
     Callback = function(value)
         print("Speed Boost:", value);
     end
@@ -101,6 +108,7 @@ Components:AddSlider(MovementBox, {
     Max = 5,
     Default = 2,
     Increment = 0.1,
+    Separator = true,
     Callback = function(value)
         print("Speed Multiplier:", value);
     end
@@ -119,6 +127,7 @@ Components:AddToggle(VisualsBox, {
     Name = "ESP Players",
     Description = "Show player outlines through walls",
     Default = false,
+    Separator = true,
     Callback = function(value)
         print("ESP Players:", value);
     end
@@ -128,6 +137,7 @@ Components:AddToggle(VisualsBox, {
     Name = "ESP Items",
     Description = "Highlight items on the ground",
     Default = false,
+    Separator = true,
     Callback = function(value)
         print("ESP Items:", value);
     end
@@ -140,6 +150,7 @@ Components:AddSlider(VisualsBox, {
     Max = 1000,
     Default = 500,
     Increment = 50,
+    Separator = true,
     Callback = function(value)
         print("ESP Distance:", value);
     end
@@ -158,6 +169,7 @@ Components:AddDropdown(VisualsBox, {
 Components:AddInput(MiscBox, {
     Name = "Custom Message",
     Placeholder = "Enter message...",
+    Separator = true,
     Callback = function(value)
         print("Custom Message:", value);
     end
@@ -174,19 +186,20 @@ Components:AddButton(MiscBox, {
 local UIBox = SettingsTab:CreateBox({
     Name = "UI Settings",
     Column = "left",
-    Height = 200
+    Height = 250
 });
 
 local KeybindsBox = SettingsTab:CreateBox({
     Name = "Keybinds",
     Column = "right", 
-    Height = 250
+    Height = 300
 });
 
--- // UI Settings
+-- // UI Settings with separators
 Components:AddToggle(UIBox, {
     Name = "Show Notifications",
     Default = true,
+    Separator = true,
     Callback = function(value)
         print("Show Notifications:", value);
     end
@@ -203,15 +216,17 @@ Components:AddSlider(UIBox, {
     end
 });
 
--- // Keybinds
+-- // Keybinds with separators
 Components:AddLabel(KeybindsBox, {
     Text = "Configure your keybinds:",
-    Size = 14
+    Size = 14,
+    Separator = true
 });
 
 Components:AddInput(KeybindsBox, {
     Name = "Toggle Menu",
     Default = "Insert",
+    Separator = true,
     Callback = function(value)
         print("Toggle Menu Key:", value);
     end
@@ -225,22 +240,28 @@ Components:AddInput(KeybindsBox, {
     end
 });
 
--- // EXTRA TAB - Single large box
+-- // EXTRA TAB - Single large box with manual separators
 local InfoBox = ExtraTab:CreateBox({
     Name = "Information",
     Column = "left",
-    Height = 400
+    Height = 450
 });
 
 Components:AddLabel(InfoBox, {
     Text = "Pink UI Library v2.0",
     Size = 18,
-    Color = Color3.fromRGB(255, 105, 180)
+    Color = Color3.fromRGB(255, 105, 180),
+    Separator = {
+        Height = 25,
+        Color = Color3.fromRGB(255, 105, 180),
+        Transparency = 0.5
+    }
 });
 
 Components:AddLabel(InfoBox, {
     Text = "Features:",
-    Size = 14
+    Size = 14,
+    Separator = true
 });
 
 Components:AddLabel(InfoBox, {
@@ -254,18 +275,30 @@ Components:AddLabel(InfoBox, {
 });
 
 Components:AddLabel(InfoBox, {
+    Text = "• Optional separators between components",
+    Size = 12
+});
+
+Components:AddLabel(InfoBox, {
     Text = "• Animated gradient title (toggle with G)",
     Size = 12
 });
 
 Components:AddLabel(InfoBox, {
     Text = "• Modern pink/black theme",
-    Size = 12
+    Size = 12,
+    Separator = {
+        Height = 20,
+        Color = Color3.fromRGB(255, 105, 180),
+        Transparency = 0.7
+    }
 });
 
-Components:AddLabel(InfoBox, {
-    Text = "• Smooth animations and transitions",
-    Size = 12
+-- // Manual separator
+Components:AddSeparator(InfoBox, {
+    Height = 25,
+    Color = Color3.fromRGB(255, 150, 200),
+    Transparency = 0.3
 });
 
 Components:AddButton(InfoBox, {
@@ -278,5 +311,8 @@ Components:AddButton(InfoBox, {
 });
 
 print("Pink UI Library loaded successfully!");
-print("Use the G button next to minimize/close to toggle title gradient");
-print("Create boxes with :CreateBox() and add components to them!");
+print("Features:");
+print("• Use :CreateBox() to create scrollable containers");
+print("• Add Separator = true to components for default separators");
+print("• Add Separator = {Height = 20, Color = Color3.new(), Transparency = 0.5} for custom separators");
+print("• Use Components:AddSeparator() for manual separators");
