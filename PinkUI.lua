@@ -49,6 +49,7 @@ function pnkui:CreateWindow(cfg)
     local cfg = cfg or {};
     local title = cfg.Title or "Pink UI";
     local subtitle = cfg.Subtitle or "by testing2122";
+    local enableGradient = cfg.TitleGradient ~= false;
     
     local gui = creategui();
     
@@ -81,10 +82,10 @@ function pnkui:CreateWindow(cfg)
     titlebar.BorderSizePixel = 0;
     titlebar.Parent = main;
     
-    -- // title text
+    -- // title text with gradient
     local titlelbl = Instance.new("TextLabel");
     titlelbl.Name = "Title";
-    titlelbl.Size = UDim2.new(1, -120, 0, 30);
+    titlelbl.Size = UDim2.new(1, -150, 0, 30);
     titlelbl.Position = UDim2.new(0, 25, 0, 15);
     titlelbl.BackgroundTransparency = 1;
     titlelbl.Text = title;
@@ -94,10 +95,72 @@ function pnkui:CreateWindow(cfg)
     titlelbl.TextXAlignment = Enum.TextXAlignment.Left;
     titlelbl.Parent = titlebar;
     
+    -- // animated gradient for title
+    local titlegrad = nil;
+    local gradientEnabled = enableGradient;
+    if enableGradient then
+        titlegrad = Instance.new("UIGradient");
+        titlegrad.Color = ColorSequence.new{
+            ColorSequenceKeypoint.new(0, clrs.pink),
+            ColorSequenceKeypoint.new(1, clrs.lightpink)
+        };
+        titlegrad.Parent = titlelbl;
+        
+        -- // animate gradient rotation
+        spawn(function()
+            while titlelbl.Parent and gradientEnabled do
+                createtween(titlegrad, TweenInfo.new(3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+                    Rotation = 360
+                }):Play();
+                wait(3);
+                if titlegrad.Parent then
+                    titlegrad.Rotation = 0;
+                end;
+            end;
+        end);
+    end;
+    
+    -- // gradient toggle button
+    local gradToggle = Instance.new("TextButton");
+    gradToggle.Size = UDim2.new(0, 25, 0, 25);
+    gradToggle.Position = UDim2.new(1, -155, 0, 22.5);
+    gradToggle.BackgroundColor3 = clrs.accent;
+    gradToggle.BorderSizePixel = 0;
+    gradToggle.Text = "G";
+    gradToggle.TextColor3 = gradientEnabled and clrs.pink or clrs.grey;
+    gradToggle.TextSize = 12;
+    gradToggle.Font = Enum.Font.GothamBold;
+    gradToggle.Parent = titlebar;
+    
+    local gradCorner = Instance.new("UICorner");
+    gradCorner.CornerRadius = UDim.new(0, 6);
+    gradCorner.Parent = gradToggle;
+    
+    gradToggle.MouseButton1Click:Connect(function()
+        gradientEnabled = not gradientEnabled;
+        if gradientEnabled then
+            if not titlegrad then
+                titlegrad = Instance.new("UIGradient");
+                titlegrad.Color = ColorSequence.new{
+                    ColorSequenceKeypoint.new(0, clrs.pink),
+                    ColorSequenceKeypoint.new(1, clrs.lightpink)
+                };
+            end;
+            titlegrad.Parent = titlelbl;
+            gradToggle.TextColor3 = clrs.pink;
+        else
+            if titlegrad then
+                titlegrad.Parent = nil;
+            end;
+            titlelbl.TextColor3 = clrs.white;
+            gradToggle.TextColor3 = clrs.grey;
+        end;
+    end);
+    
     -- // subtitle
     local subtitlelbl = Instance.new("TextLabel");
     subtitlelbl.Name = "Subtitle";
-    subtitlelbl.Size = UDim2.new(1, -120, 0, 18);
+    subtitlelbl.Size = UDim2.new(1, -150, 0, 18);
     subtitlelbl.Position = UDim2.new(0, 25, 0, 38);
     subtitlelbl.BackgroundTransparency = 1;
     subtitlelbl.Text = subtitle;
@@ -143,7 +206,7 @@ function pnkui:CreateWindow(cfg)
     closecorner.CornerRadius = UDim.new(0, 8);
     closecorner.Parent = closebtn;
     
-    -- // top separator line (grey instead of red)
+    -- // top separator line
     local topsep = Instance.new("Frame");
     topsep.Name = "TopSeparator";
     topsep.Size = UDim2.new(1, -50, 0, 1);
@@ -192,7 +255,7 @@ function pnkui:CreateWindow(cfg)
     tabpad.PaddingBottom = UDim.new(0, 8);
     tabpad.Parent = tabcont;
     
-    -- // content area with grid layout
+    -- // content area
     local content = Instance.new("Frame");
     content.Name = "Content";
     content.Size = UDim2.new(1, -265, 1, -95);
@@ -325,7 +388,7 @@ function pnkui:CreateWindow(cfg)
         undercorner.CornerRadius = UDim.new(0, 2);
         undercorner.Parent = underline;
         
-        -- // hover underline
+        -- // hover underline (grey not white)
         local hoverline = Instance.new("Frame");
         hoverline.Name = "HoverLine";
         hoverline.Size = UDim2.new(0, 0, 0, 2);
@@ -338,7 +401,7 @@ function pnkui:CreateWindow(cfg)
         hovercorner.CornerRadius = UDim.new(0, 1);
         hovercorner.Parent = hoverline;
         
-        -- // tab content with grid layout
+        -- // tab content - single scrolling frame
         local tabcontent = Instance.new("ScrollingFrame");
         tabcontent.Name = name .. "Content";
         tabcontent.Size = UDim2.new(1, 0, 1, 0);
@@ -353,12 +416,11 @@ function pnkui:CreateWindow(cfg)
         tabcontent.Visible = false;
         tabcontent.Parent = content;
         
-        -- // grid layout for sections
-        local gridlayout = Instance.new("UIGridLayout");
-        gridlayout.CellSize = UDim2.new(0, 300, 0, 250);
-        gridlayout.CellPadding = UDim2.new(0, 15, 0, 15);
-        gridlayout.SortOrder = Enum.SortOrder.LayoutOrder;
-        gridlayout.Parent = tabcontent;
+        -- // list layout for components
+        local listlayout = Instance.new("UIListLayout");
+        listlayout.SortOrder = Enum.SortOrder.LayoutOrder;
+        listlayout.Padding = UDim.new(0, 12);
+        listlayout.Parent = tabcontent;
         
         local contentpad = Instance.new("UIPadding");
         contentpad.PaddingLeft = UDim.new(0, 15);
@@ -369,17 +431,18 @@ function pnkui:CreateWindow(cfg)
         
         -- // tab functionality
         local function selecttab()
-            -- // deselect all tabs
+            -- // deselect all tabs first
             for _, tab in pairs(window.tabs) do
                 createtween(tab.label, twinfo.med, {TextColor3 = clrs.darkgrey}):Play();
                 if tab.icon then
                     createtween(tab.icon, twinfo.med, {TextColor3 = clrs.darkgrey}):Play();
                 end;
                 createtween(tab.underline, twinfo.med, {Size = UDim2.new(0, 0, 0, 3)}):Play();
+                createtween(tab.hoverline, twinfo.fast, {Size = UDim2.new(0, 0, 0, 2)}):Play();
                 tab.content.Visible = false;
             end;
             
-            -- // select this tab (only pink, no white)
+            -- // select this tab
             createtween(tablbl, twinfo.med, {TextColor3 = clrs.pink}):Play();
             if iconlbl then
                 createtween(iconlbl, twinfo.med, {TextColor3 = clrs.pink}):Play();
@@ -390,14 +453,14 @@ function pnkui:CreateWindow(cfg)
             window.activetab = name;
         end;
         
-        -- // hover effects
+        -- // hover effects (fixed to prevent white underline on selected tabs)
         tabbtn.MouseEnter:Connect(function()
             if window.activetab ~= name then
-                createtween(tablbl, twinfo.fast, {TextColor3 = clrs.white}):Play();
+                createtween(tablbl, twinfo.fast, {TextColor3 = clrs.lightpink}):Play();
                 if iconlbl then
                     createtween(iconlbl, twinfo.fast, {TextColor3 = clrs.lightpink}):Play();
                 end;
-                createtween(hoverline, twinfo.fast, {Size = UDim2.new(0, textbounds.X, 0, 2)}):Play();
+                createtween(hoverline, twinfo.fast, {Size = UDim2.new(0, textbounds.X * 0.8, 0, 2)}):Play();
             end;
         end);
         
@@ -418,6 +481,7 @@ function pnkui:CreateWindow(cfg)
             label = tablbl,
             icon = iconlbl,
             underline = underline,
+            hoverline = hoverline,
             content = tabcontent,
             name = name
         };
@@ -425,20 +489,22 @@ function pnkui:CreateWindow(cfg)
         window.tabs[name] = tab;
         
         -- // select first tab
-        if #window.tabs == 1 or window.activetab == nil then
+        if window.activetab == nil then
             selecttab();
         end;
         
         -- // tab methods
         local tabmethods = {};
+        tabmethods.content = tabcontent;
         
         function tabmethods:CreateSection(sectionname)
             local section = Instance.new("Frame");
             section.Name = sectionname;
-            section.Size = UDim2.new(1, 0, 1, 0);
+            section.Size = UDim2.new(1, 0, 0, 280);
             section.BackgroundColor3 = clrs.secondary;
             section.BackgroundTransparency = 0.1;
             section.BorderSizePixel = 0;
+            section.LayoutOrder = #tabcontent:GetChildren();
             section.Parent = tabcontent;
             
             local sectioncorner = Instance.new("UICorner");
@@ -446,9 +512,9 @@ function pnkui:CreateWindow(cfg)
             sectioncorner.Parent = section;
             
             local sectionstroke = Instance.new("UIStroke");
-            sectionstroke.Color = clrs.red;
-            sectionstroke.Thickness = 2;
-            sectionstroke.Transparency = 0.3;
+            sectionstroke.Color = clrs.pink;
+            sectionstroke.Thickness = 1;
+            sectionstroke.Transparency = 0.6;
             sectionstroke.Parent = section;
             
             -- // section title
@@ -482,20 +548,20 @@ function pnkui:CreateWindow(cfg)
             sectionlayout.Parent = sectioncontent;
             
             local sectionpad = Instance.new("UIPadding");
-            sectionpad.PaddingLeft = UDim.new(0, 5);
-            sectionpad.PaddingRight = UDim.new(0, 5);
-            sectionpad.PaddingTop = UDim.new(0, 5);
-            sectionpad.PaddingBottom = UDim.new(0, 5);
+            sectionpad.PaddingLeft = UDim.new(0, 8);
+            sectionpad.PaddingRight = UDim.new(0, 8);
+            sectionpad.PaddingTop = UDim.new(0, 8);
+            sectionpad.PaddingBottom = UDim.new(0, 8);
             sectionpad.Parent = sectioncontent;
             
             return sectioncontent;
         end;
         
-        -- // add separator method
         function tabmethods:AddSeparator()
             local sepframe = Instance.new("Frame");
             sepframe.Size = UDim2.new(1, 0, 0, 15);
             sepframe.BackgroundTransparency = 1;
+            sepframe.LayoutOrder = #tabcontent:GetChildren();
             sepframe.Parent = tabcontent;
             
             local sep = Instance.new("Frame");
