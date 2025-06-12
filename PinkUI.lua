@@ -95,29 +95,38 @@ function pnkui:CreateWindow(cfg)
     titlelbl.TextXAlignment = Enum.TextXAlignment.Left;
     titlelbl.Parent = titlebar;
     
-    -- // animated gradient for title
+    -- // smooth left-to-right animated gradient for title
     local titlegrad = nil;
     local gradientEnabled = enableGradient;
+    local gradientConnection = nil;
+    
     if enableGradient then
         titlegrad = Instance.new("UIGradient");
         titlegrad.Color = ColorSequence.new{
             ColorSequenceKeypoint.new(0, clrs.pink),
-            ColorSequenceKeypoint.new(1, clrs.lightpink)
+            ColorSequenceKeypoint.new(0.5, clrs.lightpink),
+            ColorSequence.KeyPoint.new(1, clrs.pink)
         };
+        titlegrad.Offset = Vector2.new(-1, 0);
         titlegrad.Parent = titlelbl;
         
-        -- // animate gradient rotation
-        spawn(function()
-            while titlelbl.Parent and gradientEnabled do
-                createtween(titlegrad, TweenInfo.new(3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
-                    Rotation = 360
+        -- // smooth gradient animation (left to right)
+        local function animateGradient()
+            while titlelbl.Parent and gradientEnabled and titlegrad.Parent do
+                createtween(titlegrad, TweenInfo.new(2.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+                    Offset = Vector2.new(1, 0)
                 }):Play();
-                wait(3);
+                wait(2.5);
                 if titlegrad.Parent then
-                    titlegrad.Rotation = 0;
+                    createtween(titlegrad, TweenInfo.new(2.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+                        Offset = Vector2.new(-1, 0)
+                    }):Play();
+                    wait(2.5);
                 end;
             end;
-        end);
+        end;
+        
+        spawn(animateGradient);
     end;
     
     -- // gradient toggle button
@@ -143,11 +152,29 @@ function pnkui:CreateWindow(cfg)
                 titlegrad = Instance.new("UIGradient");
                 titlegrad.Color = ColorSequence.new{
                     ColorSequenceKeypoint.new(0, clrs.pink),
-                    ColorSequenceKeypoint.new(1, clrs.lightpink)
+                    ColorSequenceKeypoint.new(0.5, clrs.lightpink),
+                    ColorSequence.KeyPoint.new(1, clrs.pink)
                 };
+                titlegrad.Offset = Vector2.new(-1, 0);
             end;
             titlegrad.Parent = titlelbl;
             gradToggle.TextColor3 = clrs.pink;
+            
+            -- // restart gradient animation
+            spawn(function()
+                while titlelbl.Parent and gradientEnabled and titlegrad.Parent do
+                    createtween(titlegrad, TweenInfo.new(2.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+                        Offset = Vector2.new(1, 0)
+                    }):Play();
+                    wait(2.5);
+                    if titlegrad.Parent then
+                        createtween(titlegrad, TweenInfo.new(2.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
+                            Offset = Vector2.new(-1, 0)
+                        }):Play();
+                        wait(2.5);
+                    end;
+                end;
+            end);
         else
             if titlegrad then
                 titlegrad.Parent = nil;
