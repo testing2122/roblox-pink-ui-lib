@@ -10,20 +10,21 @@ local mouse = plr:GetMouse();
 
 -- // color scheme
 local clrs = {
-    bg = Color3.fromRGB(15, 15, 15),
-    secondary = Color3.fromRGB(35, 35, 35),
-    accent = Color3.fromRGB(60, 60, 60),
+    bg = Color3.fromRGB(8, 8, 8),
+    secondary = Color3.fromRGB(15, 15, 15),
+    accent = Color3.fromRGB(25, 25, 25),
     pink = Color3.fromRGB(255, 105, 180),
     darkpink = Color3.fromRGB(200, 80, 140),
     white = Color3.fromRGB(255, 255, 255),
-    separator = Color3.fromRGB(80, 80, 80)
+    grey = Color3.fromRGB(120, 120, 120),
+    separator = Color3.fromRGB(40, 40, 40)
 };
 
 -- // tween configs
 local twinfo = {
-    fast = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-    med = TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-    slow = TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+    fast = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+    med = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+    slow = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
     drag = TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
 };
 
@@ -47,54 +48,73 @@ function pnkui:CreateWindow(cfg)
     
     local gui = creategui();
     
-    -- // main frame
+    -- // main frame with transparency
     local main = Instance.new("Frame");
     main.Name = "Main";
-    main.Size = UDim2.new(0, 750, 0, 500);
-    main.Position = UDim2.new(0.5, -375, 0.5, -250);
+    main.Size = UDim2.new(0, 800, 0, 550);
+    main.Position = UDim2.new(0.5, -400, 0.5, -275);
     main.BackgroundColor3 = clrs.bg;
+    main.BackgroundTransparency = 0.15;
     main.BorderSizePixel = 0;
     main.Parent = gui;
     
     local corner = Instance.new("UICorner");
-    corner.CornerRadius = UDim.new(0, 8);
+    corner.CornerRadius = UDim.new(0, 12);
     corner.Parent = main;
     
     local stroke = Instance.new("UIStroke");
-    stroke.Color = clrs.accent;
+    stroke.Color = clrs.separator;
     stroke.Thickness = 1;
+    stroke.Transparency = 0.5;
     stroke.Parent = main;
     
-    -- // title bar
+    -- // gradient accent at top left
+    local gradient = Instance.new("Frame");
+    gradient.Name = "Gradient";
+    gradient.Size = UDim2.new(0, 200, 0, 200);
+    gradient.Position = UDim2.new(0, 0, 0, 0);
+    gradient.BackgroundTransparency = 1;
+    gradient.Parent = main;
+    
+    local gradientimg = Instance.new("ImageLabel");
+    gradientimg.Size = UDim2.new(1, 0, 1, 0);
+    gradientimg.BackgroundTransparency = 1;
+    gradientimg.Image = "rbxasset://textures/ui/GuiImagePlaceholder.png";
+    gradientimg.ImageColor3 = clrs.pink;
+    gradientimg.ImageTransparency = 0.85;
+    gradientimg.Parent = gradient;
+    
+    local gradcorner = Instance.new("UICorner");
+    gradcorner.CornerRadius = UDim.new(0, 12);
+    gradcorner.Parent = gradientimg;
+    
+    local gradmask = Instance.new("UIGradient");
+    gradmask.Transparency = NumberSequence.new{
+        NumberSequenceKeypoint.new(0, 0),
+        NumberSequenceKeypoint.new(0.5, 0.8),
+        NumberSequenceKeypoint.new(1, 1)
+    };
+    gradmask.Rotation = 135;
+    gradmask.Parent = gradientimg;
+    
+    -- // title bar (transparent)
     local titlebar = Instance.new("Frame");
     titlebar.Name = "TitleBar";
-    titlebar.Size = UDim2.new(1, 0, 0, 45);
+    titlebar.Size = UDim2.new(1, 0, 0, 50);
     titlebar.Position = UDim2.new(0, 0, 0, 0);
-    titlebar.BackgroundColor3 = clrs.secondary;
+    titlebar.BackgroundTransparency = 1;
     titlebar.BorderSizePixel = 0;
     titlebar.Parent = main;
-    
-    local titlecorner = Instance.new("UICorner");
-    titlecorner.CornerRadius = UDim.new(0, 8);
-    titlecorner.Parent = titlebar;
-    
-    -- // fix corner overlap
-    local cornerfix = Instance.new("Frame");
-    cornerfix.Size = UDim2.new(1, 0, 0, 8);
-    cornerfix.Position = UDim2.new(0, 0, 1, -8);
-    cornerfix.BackgroundColor3 = clrs.secondary;
-    cornerfix.BorderSizePixel = 0;
-    cornerfix.Parent = titlebar;
     
     -- // title text
     local titlelbl = Instance.new("TextLabel");
     titlelbl.Name = "Title";
-    titlelbl.Size = UDim2.new(1, -100, 1, 0);
-    titlelbl.Position = UDim2.new(0, 15, 0, 0);
+    titlelbl.Size = UDim2.new(1, -100, 0, 25);
+    titlelbl.Position = UDim2.new(0, 20, 0, 8);
     titlelbl.BackgroundTransparency = 1;
     titlelbl.Text = title;
     titlelbl.TextColor3 = clrs.white;
-    titlelbl.TextSize = 16;
+    titlelbl.TextSize = 18;
     titlelbl.Font = Enum.Font.GothamBold;
     titlelbl.TextXAlignment = Enum.TextXAlignment.Left;
     titlelbl.Parent = titlebar;
@@ -102,12 +122,12 @@ function pnkui:CreateWindow(cfg)
     -- // subtitle
     local subtitlelbl = Instance.new("TextLabel");
     subtitlelbl.Name = "Subtitle";
-    subtitlelbl.Size = UDim2.new(1, -100, 0, 12);
-    subtitlelbl.Position = UDim2.new(0, 15, 0, 20);
+    subtitlelbl.Size = UDim2.new(1, -100, 0, 15);
+    subtitlelbl.Position = UDim2.new(0, 20, 0, 28);
     subtitlelbl.BackgroundTransparency = 1;
     subtitlelbl.Text = subtitle;
-    subtitlelbl.TextColor3 = Color3.fromRGB(150, 150, 150);
-    subtitlelbl.TextSize = 11;
+    subtitlelbl.TextColor3 = clrs.grey;
+    subtitlelbl.TextSize = 12;
     subtitlelbl.Font = Enum.Font.Gotham;
     subtitlelbl.TextXAlignment = Enum.TextXAlignment.Left;
     subtitlelbl.Parent = titlebar;
@@ -115,53 +135,30 @@ function pnkui:CreateWindow(cfg)
     -- // close button
     local closebtn = Instance.new("TextButton");
     closebtn.Name = "Close";
-    closebtn.Size = UDim2.new(0, 30, 0, 30);
-    closebtn.Position = UDim2.new(1, -40, 0, 7.5);
-    closebtn.BackgroundColor3 = Color3.fromRGB(255, 95, 95);
+    closebtn.Size = UDim2.new(0, 35, 0, 35);
+    closebtn.Position = UDim2.new(1, -45, 0, 7.5);
+    closebtn.BackgroundTransparency = 1;
     closebtn.BorderSizePixel = 0;
-    closebtn.Text = "×";
-    closebtn.TextColor3 = clrs.white;
-    closebtn.TextSize = 18;
+    closebtn.Text = "✕";
+    closebtn.TextColor3 = clrs.grey;
+    closebtn.TextSize = 16;
     closebtn.Font = Enum.Font.GothamBold;
     closebtn.Parent = titlebar;
     
-    local closecorner = Instance.new("UICorner");
-    closecorner.CornerRadius = UDim.new(0, 4);
-    closecorner.Parent = closebtn;
-    
-    -- // sidebar
+    -- // sidebar (transparent)
     local sidebar = Instance.new("Frame");
     sidebar.Name = "Sidebar";
-    sidebar.Size = UDim2.new(0, 180, 1, -45);
-    sidebar.Position = UDim2.new(0, 0, 0, 45);
-    sidebar.BackgroundColor3 = clrs.secondary;
+    sidebar.Size = UDim2.new(0, 200, 1, -60);
+    sidebar.Position = UDim2.new(0, 10, 0, 60);
+    sidebar.BackgroundTransparency = 1;
     sidebar.BorderSizePixel = 0;
     sidebar.Parent = main;
-    
-    local sidecorner = Instance.new("UICorner");
-    sidecorner.CornerRadius = UDim.new(0, 8);
-    sidecorner.Parent = sidebar;
-    
-    -- // fix sidebar corner
-    local sidefix = Instance.new("Frame");
-    sidefix.Size = UDim2.new(0, 8, 1, 0);
-    sidefix.Position = UDim2.new(1, -8, 0, 0);
-    sidefix.BackgroundColor3 = clrs.secondary;
-    sidefix.BorderSizePixel = 0;
-    sidefix.Parent = sidebar;
-    
-    local sidefix2 = Instance.new("Frame");
-    sidefix2.Size = UDim2.new(1, 0, 0, 8);
-    sidefix2.Position = UDim2.new(0, 0, 0, 0);
-    sidefix2.BackgroundColor3 = clrs.secondary;
-    sidefix2.BorderSizePixel = 0;
-    sidefix2.Parent = sidebar;
     
     -- // tab container
     local tabcont = Instance.new("ScrollingFrame");
     tabcont.Name = "TabContainer";
-    tabcont.Size = UDim2.new(1, 0, 1, -10);
-    tabcont.Position = UDim2.new(0, 0, 0, 5);
+    tabcont.Size = UDim2.new(1, 0, 1, 0);
+    tabcont.Position = UDim2.new(0, 0, 0, 0);
     tabcont.BackgroundTransparency = 1;
     tabcont.BorderSizePixel = 0;
     tabcont.ScrollBarThickness = 0;
@@ -171,12 +168,12 @@ function pnkui:CreateWindow(cfg)
     
     local tablayout = Instance.new("UIListLayout");
     tablayout.SortOrder = Enum.SortOrder.LayoutOrder;
-    tablayout.Padding = UDim.new(0, 2);
+    tablayout.Padding = UDim.new(0, 5);
     tablayout.Parent = tabcont;
     
     local tabpad = Instance.new("UIPadding");
-    tabpad.PaddingLeft = UDim.new(0, 8);
-    tabpad.PaddingRight = UDim.new(0, 8);
+    tabpad.PaddingLeft = UDim.new(0, 5);
+    tabpad.PaddingRight = UDim.new(0, 5);
     tabpad.PaddingTop = UDim.new(0, 5);
     tabpad.PaddingBottom = UDim.new(0, 5);
     tabpad.Parent = tabcont;
@@ -184,20 +181,11 @@ function pnkui:CreateWindow(cfg)
     -- // content area
     local content = Instance.new("Frame");
     content.Name = "Content";
-    content.Size = UDim2.new(1, -185, 1, -50);
-    content.Position = UDim2.new(0, 185, 0, 50);
-    content.BackgroundColor3 = clrs.bg;
+    content.Size = UDim2.new(1, -230, 1, -70);
+    content.Position = UDim2.new(0, 220, 0, 60);
+    content.BackgroundTransparency = 1;
     content.BorderSizePixel = 0;
     content.Parent = main;
-    
-    -- // separator line
-    local separator = Instance.new("Frame");
-    separator.Name = "Separator";
-    separator.Size = UDim2.new(0, 1, 1, -45);
-    separator.Position = UDim2.new(0, 180, 0, 45);
-    separator.BackgroundColor3 = clrs.separator;
-    separator.BorderSizePixel = 0;
-    separator.Parent = main;
     
     -- // drag functionality
     local dragging = false;
@@ -228,16 +216,16 @@ function pnkui:CreateWindow(cfg)
     
     -- // close button functionality
     closebtn.MouseEnter:Connect(function()
-        createtween(closebtn, twinfo.fast, {BackgroundColor3 = Color3.fromRGB(255, 120, 120)}):Play();
+        createtween(closebtn, twinfo.fast, {TextColor3 = clrs.pink}):Play();
     end);
     
     closebtn.MouseLeave:Connect(function()
-        createtween(closebtn, twinfo.fast, {BackgroundColor3 = Color3.fromRGB(255, 95, 95)}):Play();
+        createtween(closebtn, twinfo.fast, {TextColor3 = clrs.grey}):Play();
     end);
     
     closebtn.MouseButton1Click:Connect(function()
         createtween(main, twinfo.med, {Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(0.5, 0, 0.5, 0)}):Play();
-        wait(0.25);
+        wait(0.3);
         gui:Destroy();
     end);
     
@@ -250,18 +238,14 @@ function pnkui:CreateWindow(cfg)
         local name = cfg.Name or "Tab";
         local icon = cfg.Icon or "";
         
-        -- // tab button
+        -- // tab button (no background)
         local tabbtn = Instance.new("TextButton");
         tabbtn.Name = name;
-        tabbtn.Size = UDim2.new(1, 0, 0, 35);
-        tabbtn.BackgroundColor3 = clrs.accent;
+        tabbtn.Size = UDim2.new(1, 0, 0, 40);
+        tabbtn.BackgroundTransparency = 1;
         tabbtn.BorderSizePixel = 0;
         tabbtn.Text = "";
         tabbtn.Parent = tabcont;
-        
-        local tabcorner = Instance.new("UICorner");
-        tabcorner.CornerRadius = UDim.new(0, 6);
-        tabcorner.Parent = tabbtn;
         
         -- // tab icon (if provided)
         local iconlbl = nil;
@@ -271,7 +255,7 @@ function pnkui:CreateWindow(cfg)
             iconlbl.Position = UDim2.new(0, 10, 0.5, -10);
             iconlbl.BackgroundTransparency = 1;
             iconlbl.Text = icon;
-            iconlbl.TextColor3 = clrs.white;
+            iconlbl.TextColor3 = clrs.grey;
             iconlbl.TextSize = 14;
             iconlbl.Font = Enum.Font.Gotham;
             iconlbl.Parent = tabbtn;
@@ -283,11 +267,37 @@ function pnkui:CreateWindow(cfg)
         tablbl.Position = UDim2.new(0, iconlbl and 35 or 10, 0, 0);
         tablbl.BackgroundTransparency = 1;
         tablbl.Text = name;
-        tablbl.TextColor3 = clrs.white;
-        tablbl.TextSize = 13;
+        tablbl.TextColor3 = clrs.grey;
+        tablbl.TextSize = 14;
         tablbl.Font = Enum.Font.Gotham;
         tablbl.TextXAlignment = Enum.TextXAlignment.Left;
         tablbl.Parent = tabbtn;
+        
+        -- // pink underline for selected tab
+        local underline = Instance.new("Frame");
+        underline.Name = "Underline";
+        underline.Size = UDim2.new(0, 0, 0, 2);
+        underline.Position = UDim2.new(0, 10, 1, -2);
+        underline.BackgroundColor3 = clrs.pink;
+        underline.BorderSizePixel = 0;
+        underline.Parent = tabbtn;
+        
+        local undercorner = Instance.new("UICorner");
+        undercorner.CornerRadius = UDim.new(0, 1);
+        undercorner.Parent = underline;
+        
+        -- // hover underline
+        local hoverline = Instance.new("Frame");
+        hoverline.Name = "HoverLine";
+        hoverline.Size = UDim2.new(0, 0, 0, 1);
+        hoverline.Position = UDim2.new(0, 10, 1, -1);
+        hoverline.BackgroundColor3 = clrs.grey;
+        hoverline.BorderSizePixel = 0;
+        hoverline.Parent = tabbtn;
+        
+        local hovercorner = Instance.new("UICorner");
+        hovercorner.CornerRadius = UDim.new(0, 1);
+        hovercorner.Parent = hoverline;
         
         -- // tab content
         local tabcontent = Instance.new("ScrollingFrame");
@@ -296,7 +306,7 @@ function pnkui:CreateWindow(cfg)
         tabcontent.Position = UDim2.new(0, 0, 0, 0);
         tabcontent.BackgroundTransparency = 1;
         tabcontent.BorderSizePixel = 0;
-        tabcontent.ScrollBarThickness = 3;
+        tabcontent.ScrollBarThickness = 2;
         tabcontent.ScrollBarImageColor3 = clrs.pink;
         tabcontent.CanvasSize = UDim2.new(0, 0, 0, 0);
         tabcontent.AutomaticCanvasSize = Enum.AutomaticSize.Y;
@@ -305,7 +315,7 @@ function pnkui:CreateWindow(cfg)
         
         local contentlayout = Instance.new("UIListLayout");
         contentlayout.SortOrder = Enum.SortOrder.LayoutOrder;
-        contentlayout.Padding = UDim.new(0, 8);
+        contentlayout.Padding = UDim.new(0, 10);
         contentlayout.Parent = tabcontent;
         
         local contentpad = Instance.new("UIPadding");
@@ -319,20 +329,20 @@ function pnkui:CreateWindow(cfg)
         local function selecttab()
             -- // deselect all tabs
             for _, tab in pairs(window.tabs) do
-                createtween(tab.button, twinfo.med, {BackgroundColor3 = clrs.accent}):Play();
-                createtween(tab.label, twinfo.med, {TextColor3 = clrs.white}):Play();
+                createtween(tab.label, twinfo.med, {TextColor3 = clrs.grey}):Play();
                 if tab.icon then
-                    createtween(tab.icon, twinfo.med, {TextColor3 = clrs.white}):Play();
+                    createtween(tab.icon, twinfo.med, {TextColor3 = clrs.grey}):Play();
                 end;
+                createtween(tab.underline, twinfo.med, {Size = UDim2.new(0, 0, 0, 2)}):Play();
                 tab.content.Visible = false;
             end;
             
             -- // select this tab
-            createtween(tabbtn, twinfo.med, {BackgroundColor3 = clrs.pink}):Play();
             createtween(tablbl, twinfo.med, {TextColor3 = clrs.white}):Play();
             if iconlbl then
-                createtween(iconlbl, twinfo.med, {TextColor3 = clrs.white}):Play();
+                createtween(iconlbl, twinfo.med, {TextColor3 = clrs.pink}):Play();
             end;
+            createtween(underline, twinfo.med, {Size = UDim2.new(1, -20, 0, 2)}):Play();
             
             tabcontent.Visible = true;
             window.activetab = name;
@@ -341,21 +351,21 @@ function pnkui:CreateWindow(cfg)
         -- // hover effects
         tabbtn.MouseEnter:Connect(function()
             if window.activetab ~= name then
-                createtween(tabbtn, twinfo.fast, {BackgroundColor3 = Color3.fromRGB(80, 80, 80)}):Play();
-                createtween(tablbl, twinfo.fast, {TextColor3 = clrs.pink}):Play();
+                createtween(tablbl, twinfo.fast, {TextColor3 = clrs.white}):Play();
                 if iconlbl then
                     createtween(iconlbl, twinfo.fast, {TextColor3 = clrs.pink}):Play();
                 end;
+                createtween(hoverline, twinfo.fast, {Size = UDim2.new(1, -20, 0, 1)}):Play();
             end;
         end);
         
         tabbtn.MouseLeave:Connect(function()
             if window.activetab ~= name then
-                createtween(tabbtn, twinfo.fast, {BackgroundColor3 = clrs.accent}):Play();
-                createtween(tablbl, twinfo.fast, {TextColor3 = clrs.white}):Play();
+                createtween(tablbl, twinfo.fast, {TextColor3 = clrs.grey}):Play();
                 if iconlbl then
-                    createtween(iconlbl, twinfo.fast, {TextColor3 = clrs.white}):Play();
+                    createtween(iconlbl, twinfo.fast, {TextColor3 = clrs.grey}):Play();
                 end;
+                createtween(hoverline, twinfo.fast, {Size = UDim2.new(0, 0, 0, 1)}):Play();
             end;
         end);
         
@@ -365,6 +375,7 @@ function pnkui:CreateWindow(cfg)
             button = tabbtn,
             label = tablbl,
             icon = iconlbl,
+            underline = underline,
             content = tabcontent,
             name = name
         };
@@ -382,17 +393,18 @@ function pnkui:CreateWindow(cfg)
         function tabmethods:AddSeparator(text)
             local sep = Instance.new("Frame");
             sep.Name = "Separator";
-            sep.Size = UDim2.new(1, 0, 0, 20);
+            sep.Size = UDim2.new(1, 0, 0, 25);
             sep.BackgroundTransparency = 1;
             sep.Parent = tabcontent;
             
             if text then
                 local seplbl = Instance.new("TextLabel");
-                seplbl.Size = UDim2.new(1, 0, 1, 0);
+                seplbl.Size = UDim2.new(1, 0, 0, 20);
+                seplbl.Position = UDim2.new(0, 0, 0, 0);
                 seplbl.BackgroundTransparency = 1;
                 seplbl.Text = text;
-                seplbl.TextColor3 = clrs.separator;
-                seplbl.TextSize = 12;
+                seplbl.TextColor3 = clrs.grey;
+                seplbl.TextSize = 13;
                 seplbl.Font = Enum.Font.GothamBold;
                 seplbl.TextXAlignment = Enum.TextXAlignment.Left;
                 seplbl.Parent = sep;
@@ -400,10 +412,15 @@ function pnkui:CreateWindow(cfg)
             
             local sepline = Instance.new("Frame");
             sepline.Size = UDim2.new(1, 0, 0, 1);
-            sepline.Position = UDim2.new(0, 0, 1, -1);
+            sepline.Position = UDim2.new(0, 0, 1, -3);
             sepline.BackgroundColor3 = clrs.separator;
             sepline.BorderSizePixel = 0;
+            sepline.BackgroundTransparency = 0.7;
             sepline.Parent = sep;
+            
+            local sepcorner = Instance.new("UICorner");
+            sepcorner.CornerRadius = UDim.new(0, 1);
+            sepcorner.Parent = sepline;
         end;
         
         return tabmethods;
