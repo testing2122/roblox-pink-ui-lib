@@ -1,18 +1,39 @@
--- // example usage of PinkUI library
--- // load the library files first
+-- // enhanced example usage of PinkUI library
+-- // load the library files
 local pnkui = loadstring(game:HttpGet("https://raw.githubusercontent.com/testing2122/roblox-pink-ui-lib/main/PinkUI.lua"))();
 local components = loadstring(game:HttpGet("https://raw.githubusercontent.com/testing2122/roblox-pink-ui-lib/main/Components.lua"))();
+local extensions = loadstring(game:HttpGet("https://raw.githubusercontent.com/testing2122/roblox-pink-ui-lib/main/Extensions.lua"))();
 
--- // create window
+-- // create modern window
 local window = pnkui:CreateWindow({
-    Title = "Pink UI Demo",
-    Subtitle = "by testing2122"
+    Title = "INSANITY",
+    Subtitle = "Premium Experience"
 });
 
--- // create tabs
+-- // create multiple tabs to showcase scrolling
 local maintab = window:CreateTab({
     Name = "Main",
     Icon = "🏠"
+});
+
+local combattab = window:CreateTab({
+    Name = "Combat",
+    Icon = "⚔️"
+});
+
+local visualtab = window:CreateTab({
+    Name = "Visuals", 
+    Icon = "👁️"
+});
+
+local playertab = window:CreateTab({
+    Name = "Player",
+    Icon = "🏃"
+});
+
+local misctab = window:CreateTab({
+    Name = "Misc",
+    Icon = "🔧"
 });
 
 local settingstab = window:CreateTab({
@@ -20,147 +41,334 @@ local settingstab = window:CreateTab({
     Icon = "⚙️"
 });
 
-local misctab = window:CreateTab({
-    Name = "Misc",
-    Icon = "🎯"
+local configtab = window:CreateTab({
+    Name = "Config",
+    Icon = "💾"
 });
 
--- // add components to main tab
-maintab:AddSeparator("Basic Components");
+-- // MAIN TAB
+maintab:AddSeparator("Core Features");
 
-components:AddButton(maintab.content, {
-    Text = "Click Me!",
-    Callback = function()
-        print("button clicked!");
-    end
-});
-
-local toggle = components:AddToggle(maintab.content, {
-    Text = "Enable Feature",
+local autofarm = components:AddToggle(maintab.content, {
+    Text = "Auto Farm",
     Default = false,
     Callback = function(state)
-        print("toggle state:", state);
+        print("Auto Farm:", state);
     end
 });
 
-local slider = components:AddSlider(maintab.content, {
-    Text = "Speed Multiplier",
+components:AddSlider(maintab.content, {
+    Text = "Farm Speed",
+    Min = 1,
+    Max = 20,
+    Default = 10,
+    Suffix = "x",
+    Callback = function(value)
+        print("Farm Speed:", value);
+    end
+});
+
+components:AddToggle(maintab.content, {
+    Text = "Auto Collect",
+    Default = true,
+    Callback = function(state)
+        print("Auto Collect:", state);
+    end
+});
+
+maintab:AddSeparator("Protection");
+
+components:AddToggle(maintab.content, {
+    Text = "Anti AFK",
+    Default = true,
+    Callback = function(state)
+        print("Anti AFK:", state);
+    end
+});
+
+components:AddToggle(maintab.content, {
+    Text = "Safe Mode",
+    Default = false,
+    Callback = function(state)
+        print("Safe Mode:", state);
+    end
+});
+
+-- // COMBAT TAB
+combattab:AddSeparator("Aimbot");
+
+components:AddToggle(combattab.content, {
+    Text = "Aimbot",
+    Default = false,
+    Callback = function(state)
+        print("Aimbot:", state);
+    end
+});
+
+components:AddSlider(combattab.content, {
+    Text = "FOV Size",
+    Min = 50,
+    Max = 500,
+    Default = 200,
+    Suffix = "px",
+    Callback = function(value)
+        print("FOV:", value);
+    end
+});
+
+components:AddSlider(combattab.content, {
+    Text = "Smoothing",
     Min = 1,
     Max = 10,
     Default = 5,
-    Suffix = "x",
+    Suffix = "",
     Callback = function(value)
-        print("slider value:", value);
+        print("Smoothing:", value);
     end
 });
 
-maintab:AddSeparator("Input Components");
+combattab:AddSeparator("Combat Assists");
 
-local input = components:AddInput(maintab.content, {
-    Text = "Player Name",
-    Placeholder = "Enter player name...",
-    Callback = function(text)
-        print("input text:", text);
+components:AddToggle(combattab.content, {
+    Text = "Silent Aim",
+    Default = false,
+    Callback = function(state)
+        print("Silent Aim:", state);
     end
 });
 
-components:AddLabel(maintab.content, {
-    Text = "This is a label component that can display information.",
-    Size = 12
+extensions:AddDropdown(combattab.content, {
+    Text = "Target Part",
+    Options = {"Head", "Torso", "Random"},
+    Default = "Head",
+    Callback = function(selected)
+        print("Target Part:", selected);
+    end
 });
 
--- // add components to settings tab
-settingstab:AddSeparator("Visual Settings");
+-- // VISUALS TAB
+visualtab:AddSeparator("ESP");
 
-components:AddToggle(settingstab.content, {
-    Text = "Enable Animations",
+components:AddToggle(visualtab.content, {
+    Text = "Player ESP",
+    Default = false,
+    Callback = function(state)
+        print("Player ESP:", state);
+    end
+});
+
+components:AddToggle(visualtab.content, {
+    Text = "Name Tags",
     Default = true,
     Callback = function(state)
-        print("animations:", state);
+        print("Name Tags:", state);
     end
 });
+
+components:AddToggle(visualtab.content, {
+    Text = "Health Bars",
+    Default = false,
+    Callback = function(state)
+        print("Health Bars:", state);
+    end
+});
+
+visualtab:AddSeparator("Customization");
+
+extensions:AddColorPicker(visualtab.content, {
+    Text = "ESP Color",
+    Default = Color3.fromRGB(255, 105, 180),
+    Callback = function(color)
+        print("ESP Color:", color);
+    end
+});
+
+components:AddSlider(visualtab.content, {
+    Text = "ESP Transparency",
+    Min = 0,
+    Max = 100,
+    Default = 50,
+    Suffix = "%",
+    Callback = function(value)
+        print("ESP Transparency:", value);
+    end
+});
+
+-- // PLAYER TAB
+playertab:AddSeparator("Movement");
+
+components:AddSlider(playertab.content, {
+    Text = "Walk Speed",
+    Min = 16,
+    Max = 200,
+    Default = 16,
+    Suffix = "",
+    Callback = function(value)
+        print("Walk Speed:", value);
+        if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value;
+        end;
+    end
+});
+
+components:AddSlider(playertab.content, {
+    Text = "Jump Power",
+    Min = 50,
+    Max = 300,
+    Default = 50,
+    Suffix = "",
+    Callback = function(value)
+        print("Jump Power:", value);
+        if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+            game.Players.LocalPlayer.Character.Humanoid.JumpPower = value;
+        end;
+    end
+});
+
+playertab:AddSeparator("Abilities");
+
+components:AddToggle(playertab.content, {
+    Text = "Infinite Jump",
+    Default = false,
+    Callback = function(state)
+        print("Infinite Jump:", state);
+    end
+});
+
+components:AddToggle(playertab.content, {
+    Text = "Noclip",
+    Default = false,
+    Callback = function(state)
+        print("Noclip:", state);
+    end
+});
+
+extensions:AddKeyBind(playertab.content, {
+    Text = "Fly Toggle",
+    Default = Enum.KeyCode.F,
+    Callback = function()
+        print("Fly toggled!");
+    end
+});
+
+-- // MISC TAB
+misctab:AddSeparator("Utilities");
+
+components:AddButton(misctab.content, {
+    Text = "Rejoin Server",
+    Callback = function()
+        game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer);
+    end
+});
+
+components:AddButton(misctab.content, {
+    Text = "Copy Game Link",
+    Callback = function()
+        setclipboard("https://www.roblox.com/games/" .. game.PlaceId);
+        print("Game link copied!");
+    end
+});
+
+misctab:AddSeparator("Information");
+
+components:AddLabel(misctab.content, {
+    Text = "Game: " .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
+    Size = 13,
+    Color = Color3.fromRGB(120, 120, 125)
+});
+
+components:AddLabel(misctab.content, {
+    Text = "Players: " .. #game.Players:GetPlayers() .. "/12",
+    Size = 13,
+    Color = Color3.fromRGB(120, 120, 125)
+});
+
+-- // SETTINGS TAB
+settingstab:AddSeparator("Interface");
 
 components:AddSlider(settingstab.content, {
     Text = "UI Scale",
-    Min = 0.5,
-    Max = 2,
-    Default = 1,
+    Min = 0.8,
+    Max = 1.5,
+    Default = 1.0,
     Suffix = "x",
     Callback = function(value)
-        print("ui scale:", value);
+        print("UI Scale:", value);
     end
 });
 
 components:AddToggle(settingstab.content, {
-    Text = "Show Notifications",
+    Text = "Notifications",
     Default = true,
     Callback = function(state)
-        print("notifications:", state);
+        print("Notifications:", state);
     end
 });
 
 settingstab:AddSeparator("Performance");
 
+extensions:AddDropdown(settingstab.content, {
+    Text = "Render Quality",
+    Options = {"Low", "Medium", "High", "Ultra"},
+    Default = "High",
+    Callback = function(selected)
+        print("Render Quality:", selected);
+    end
+});
+
 components:AddSlider(settingstab.content, {
     Text = "Max FPS",
     Min = 30,
-    Max = 144,
+    Max = 240,
     Default = 60,
     Suffix = " fps",
     Callback = function(value)
-        print("max fps:", value);
+        print("Max FPS:", value);
     end
 });
 
--- // add components to misc tab
-misctab:AddSeparator("Utility Functions");
+-- // CONFIG TAB
+configtab:AddSeparator("Configuration");
 
-components:AddButton(misctab.content, {
-    Text = "Reset All Settings",
+components:AddInput(configtab.content, {
+    Text = "Config Name",
+    Placeholder = "Enter config name...",
+    Callback = function(text)
+        print("Config Name:", text);
+    end
+});
+
+components:AddButton(configtab.content, {
+    Text = "Save Configuration",
     Callback = function()
-        print("resetting all settings...");
-        toggle:SetValue(false);
-        slider:SetValue(5);
-        input:SetValue("");
+        print("Configuration saved!");
     end
 });
 
-components:AddButton(misctab.content, {
-    Text = "Copy Debug Info",
+components:AddButton(configtab.content, {
+    Text = "Load Configuration", 
     Callback = function()
-        local info = {
-            "Pink UI Debug Info:",
-            "Toggle State: " .. tostring(toggle:GetValue()),
-            "Slider Value: " .. tostring(slider:GetValue()),
-            "Input Text: " .. input:GetValue(),
-            "Timestamp: " .. os.date()
-        };
-        setclipboard(table.concat(info, "\n"));
-        print("debug info copied to clipboard");
+        print("Configuration loaded!");
     end
 });
 
-misctab:AddSeparator("Advanced Features");
+configtab:AddSeparator("Reset");
 
-components:AddInput(misctab.content, {
-    Text = "Execute Lua Code",
-    Placeholder = "print('hello world')",
-    Callback = function(code)
-        if code ~= "" then
-            local success, result = pcall(loadstring(code));
-            if success then
-                print("executed successfully:", result);
-            else
-                warn("execution failed:", result);
-            end;
-        end;
+components:AddButton(configtab.content, {
+    Text = "Reset to Defaults",
+    Callback = function()
+        print("Settings reset to defaults!");
+        autofarm:SetValue(false);
     end
 });
 
-components:AddLabel(misctab.content, {
-    Text = "Warning: Only execute trusted code!",
-    Color = Color3.fromRGB(255, 200, 100)
+-- // startup message
+components:AddLabel(maintab.content, {
+    Text = "Welcome to INSANITY! Premium scripting experience.",
+    Size = 12,
+    Color = Color3.fromRGB(255, 150, 200)
 });
 
-print("Pink UI Demo loaded successfully!");
-print("Repository: https://github.com/testing2122/roblox-pink-ui-lib");
+print("🌸 Pink UI Demo loaded successfully!");
+print("📁 Repository: https://github.com/testing2122/roblox-pink-ui-lib");
+print("✨ Features: Scrollable tabs, modern design, and premium aesthetics");
