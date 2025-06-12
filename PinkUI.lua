@@ -428,7 +428,7 @@ function pnkui:CreateWindow(cfg)
         hovercorner.CornerRadius = UDim.new(0, 1);
         hovercorner.Parent = hoverline;
         
-        -- // tab content - single scrolling frame
+        -- // tab content - main scrolling frame with columns
         local tabcontent = Instance.new("ScrollingFrame");
         tabcontent.Name = name .. "Content";
         tabcontent.Size = UDim2.new(1, 0, 1, 0);
@@ -443,18 +443,57 @@ function pnkui:CreateWindow(cfg)
         tabcontent.Visible = false;
         tabcontent.Parent = content;
         
-        -- // list layout for components
-        local listlayout = Instance.new("UIListLayout");
-        listlayout.SortOrder = Enum.SortOrder.LayoutOrder;
-        listlayout.Padding = UDim.new(0, 12);
-        listlayout.Parent = tabcontent;
+        -- // left column
+        local leftcolumn = Instance.new("ScrollingFrame");
+        leftcolumn.Name = "LeftColumn";
+        leftcolumn.Size = UDim2.new(0.48, 0, 1, 0);
+        leftcolumn.Position = UDim2.new(0, 15, 0, 15);
+        leftcolumn.BackgroundTransparency = 1;
+        leftcolumn.BorderSizePixel = 0;
+        leftcolumn.ScrollBarThickness = 3;
+        leftcolumn.ScrollBarImageColor3 = clrs.pink;
+        leftcolumn.ScrollBarImageTransparency = 0.8;
+        leftcolumn.CanvasSize = UDim2.new(0, 0, 0, 0);
+        leftcolumn.AutomaticCanvasSize = Enum.AutomaticSize.Y;
+        leftcolumn.Parent = tabcontent;
         
-        local contentpad = Instance.new("UIPadding");
-        contentpad.PaddingLeft = UDim.new(0, 15);
-        contentpad.PaddingRight = UDim.new(0, 15);
-        contentpad.PaddingTop = UDim.new(0, 15);
-        contentpad.PaddingBottom = UDim.new(0, 15);
-        contentpad.Parent = tabcontent;
+        local leftlayout = Instance.new("UIListLayout");
+        leftlayout.SortOrder = Enum.SortOrder.LayoutOrder;
+        leftlayout.Padding = UDim.new(0, 12);
+        leftlayout.Parent = leftcolumn;
+        
+        local leftpad = Instance.new("UIPadding");
+        leftpad.PaddingLeft = UDim.new(0, 8);
+        leftpad.PaddingRight = UDim.new(0, 8);
+        leftpad.PaddingTop = UDim.new(0, 8);
+        leftpad.PaddingBottom = UDim.new(0, 8);
+        leftpad.Parent = leftcolumn;
+        
+        -- // right column
+        local rightcolumn = Instance.new("ScrollingFrame");
+        rightcolumn.Name = "RightColumn";
+        rightcolumn.Size = UDim2.new(0.48, 0, 1, 0);
+        rightcolumn.Position = UDim2.new(0.52, 0, 0, 15);
+        rightcolumn.BackgroundTransparency = 1;
+        rightcolumn.BorderSizePixel = 0;
+        rightcolumn.ScrollBarThickness = 3;
+        rightcolumn.ScrollBarImageColor3 = clrs.pink;
+        rightcolumn.ScrollBarImageTransparency = 0.8;
+        rightcolumn.CanvasSize = UDim2.new(0, 0, 0, 0);
+        rightcolumn.AutomaticCanvasSize = Enum.AutomaticSize.Y;
+        rightcolumn.Parent = tabcontent;
+        
+        local rightlayout = Instance.new("UIListLayout");
+        rightlayout.SortOrder = Enum.SortOrder.LayoutOrder;
+        rightlayout.Padding = UDim.new(0, 12);
+        rightlayout.Parent = rightcolumn;
+        
+        local rightpad = Instance.new("UIPadding");
+        rightpad.PaddingLeft = UDim.new(0, 8);
+        rightpad.PaddingRight = UDim.new(0, 8);
+        rightpad.PaddingTop = UDim.new(0, 8);
+        rightpad.PaddingBottom = UDim.new(0, 8);
+        rightpad.Parent = rightcolumn;
         
         -- // tab functionality
         local function selecttab()
@@ -510,6 +549,8 @@ function pnkui:CreateWindow(cfg)
             underline = underline,
             hoverline = hoverline,
             content = tabcontent,
+            leftcolumn = leftcolumn,
+            rightcolumn = rightcolumn,
             name = name
         };
         
@@ -523,65 +564,79 @@ function pnkui:CreateWindow(cfg)
         -- // tab methods
         local tabmethods = {};
         tabmethods.content = tabcontent;
+        tabmethods.leftcolumn = leftcolumn;
+        tabmethods.rightcolumn = rightcolumn;
         
-        function tabmethods:CreateSection(sectionname)
-            local section = Instance.new("Frame");
-            section.Name = sectionname;
-            section.Size = UDim2.new(1, 0, 0, 280);
-            section.BackgroundColor3 = clrs.secondary;
-            section.BackgroundTransparency = 0.1;
-            section.BorderSizePixel = 0;
-            section.LayoutOrder = #tabcontent:GetChildren();
-            section.Parent = tabcontent;
+        function tabmethods:CreateBox(cfg)
+            local cfg = cfg or {};
+            local name = cfg.Name or "Box";
+            local column = cfg.Column or "left"; -- "left" or "right"
+            local height = cfg.Height or 300;
             
-            local sectioncorner = Instance.new("UICorner");
-            sectioncorner.CornerRadius = UDim.new(0, 12);
-            sectioncorner.Parent = section;
+            local targetcolumn = column == "right" and rightcolumn or leftcolumn;
             
-            local sectionstroke = Instance.new("UIStroke");
-            sectionstroke.Color = clrs.pink;
-            sectionstroke.Thickness = 1;
-            sectionstroke.Transparency = 0.6;
-            sectionstroke.Parent = section;
+            local box = Instance.new("ScrollingFrame");
+            box.Name = name;
+            box.Size = UDim2.new(1, 0, 0, height);
+            box.BackgroundColor3 = clrs.secondary;
+            box.BackgroundTransparency = 0.1;
+            box.BorderSizePixel = 0;
+            box.ScrollBarThickness = 2;
+            box.ScrollBarImageColor3 = clrs.pink;
+            box.ScrollBarImageTransparency = 0.8;
+            box.CanvasSize = UDim2.new(0, 0, 0, 0);
+            box.AutomaticCanvasSize = Enum.AutomaticSize.Y;
+            box.LayoutOrder = #targetcolumn:GetChildren();
+            box.Parent = targetcolumn;
             
-            -- // section title
-            local sectiontitle = Instance.new("TextLabel");
-            sectiontitle.Size = UDim2.new(1, -20, 0, 30);
-            sectiontitle.Position = UDim2.new(0, 10, 0, 10);
-            sectiontitle.BackgroundTransparency = 1;
-            sectiontitle.Text = sectionname;
-            sectiontitle.TextColor3 = clrs.lightpink;
-            sectiontitle.TextSize = 16;
-            sectiontitle.Font = Enum.Font.GothamBold;
-            sectiontitle.TextXAlignment = Enum.TextXAlignment.Left;
-            sectiontitle.Parent = section;
+            local boxcorner = Instance.new("UICorner");
+            boxcorner.CornerRadius = UDim.new(0, 12);
+            boxcorner.Parent = box;
             
-            -- // section content
-            local sectioncontent = Instance.new("ScrollingFrame");
-            sectioncontent.Size = UDim2.new(1, -20, 1, -50);
-            sectioncontent.Position = UDim2.new(0, 10, 0, 40);
-            sectioncontent.BackgroundTransparency = 1;
-            sectioncontent.BorderSizePixel = 0;
-            sectioncontent.ScrollBarThickness = 2;
-            sectioncontent.ScrollBarImageColor3 = clrs.pink;
-            sectioncontent.ScrollBarImageTransparency = 0.8;
-            sectioncontent.CanvasSize = UDim2.new(0, 0, 0, 0);
-            sectioncontent.AutomaticCanvasSize = Enum.AutomaticSize.Y;
-            sectioncontent.Parent = section;
+            local boxstroke = Instance.new("UIStroke");
+            boxstroke.Color = clrs.pink;
+            boxstroke.Thickness = 1;
+            boxstroke.Transparency = 0.6;
+            boxstroke.Parent = box;
             
-            local sectionlayout = Instance.new("UIListLayout");
-            sectionlayout.SortOrder = Enum.SortOrder.LayoutOrder;
-            sectionlayout.Padding = UDim.new(0, 8);
-            sectionlayout.Parent = sectioncontent;
+            -- // box title
+            local boxtitle = Instance.new("TextLabel");
+            boxtitle.Size = UDim2.new(1, -20, 0, 30);
+            boxtitle.Position = UDim2.new(0, 10, 0, 10);
+            boxtitle.BackgroundTransparency = 1;
+            boxtitle.Text = name;
+            boxtitle.TextColor3 = clrs.lightpink;
+            boxtitle.TextSize = 16;
+            boxtitle.Font = Enum.Font.GothamBold;
+            boxtitle.TextXAlignment = Enum.TextXAlignment.Left;
+            boxtitle.Parent = box;
             
-            local sectionpad = Instance.new("UIPadding");
-            sectionpad.PaddingLeft = UDim.new(0, 8);
-            sectionpad.PaddingRight = UDim.new(0, 8);
-            sectionpad.PaddingTop = UDim.new(0, 8);
-            sectionpad.PaddingBottom = UDim.new(0, 8);
-            sectionpad.Parent = sectioncontent;
+            -- // box content
+            local boxcontent = Instance.new("ScrollingFrame");
+            boxcontent.Size = UDim2.new(1, -20, 1, -50);
+            boxcontent.Position = UDim2.new(0, 10, 0, 40);
+            boxcontent.BackgroundTransparency = 1;
+            boxcontent.BorderSizePixel = 0;
+            boxcontent.ScrollBarThickness = 2;
+            boxcontent.ScrollBarImageColor3 = clrs.pink;
+            boxcontent.ScrollBarImageTransparency = 0.8;
+            boxcontent.CanvasSize = UDim2.new(0, 0, 0, 0);
+            boxcontent.AutomaticCanvasSize = Enum.AutomaticSize.Y;
+            boxcontent.Parent = box;
             
-            return sectioncontent;
+            local boxlayout = Instance.new("UIListLayout");
+            boxlayout.SortOrder = Enum.SortOrder.LayoutOrder;
+            boxlayout.Padding = UDim.new(0, 8);
+            boxlayout.Parent = boxcontent;
+            
+            local boxpad = Instance.new("UIPadding");
+            boxpad.PaddingLeft = UDim.new(0, 8);
+            boxpad.PaddingRight = UDim.new(0, 8);
+            boxpad.PaddingTop = UDim.new(0, 8);
+            boxpad.PaddingBottom = UDim.new(0, 8);
+            boxpad.Parent = boxcontent;
+            
+            return boxcontent;
         end;
         
         function tabmethods:AddSeparator()
