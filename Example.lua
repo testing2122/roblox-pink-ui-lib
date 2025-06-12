@@ -1,374 +1,523 @@
--- // enhanced example usage of PinkUI library
--- // load the library files
+-- // comprehensive example showcasing all pink ui features
 local pnkui = loadstring(game:HttpGet("https://raw.githubusercontent.com/testing2122/roblox-pink-ui-lib/main/PinkUI.lua"))();
 local components = loadstring(game:HttpGet("https://raw.githubusercontent.com/testing2122/roblox-pink-ui-lib/main/Components.lua"))();
 local extensions = loadstring(game:HttpGet("https://raw.githubusercontent.com/testing2122/roblox-pink-ui-lib/main/Extensions.lua"))();
 
--- // create modern window
-local window = pnkui:CreateWindow({
+-- // create main window
+local win = pnkui:CreateWindow({
     Title = "INSANITY",
     Subtitle = "Premium Experience"
 });
 
--- // create multiple tabs to showcase scrolling
-local maintab = window:CreateTab({
+-- // variables for features
+local autoclick = false;
+local walkspeed = 16;
+local jumppower = 50;
+local espplayers = false;
+local wallhack = false;
+local infinitehealth = false;
+local currentconfig = "default";
+
+-- // main tab
+local maintab = win:CreateTab({
     Name = "Main",
     Icon = "🏠"
 });
 
-local combattab = window:CreateTab({
-    Name = "Combat",
-    Icon = "⚔️"
-});
+-- // core features section
+local coresect = maintab:CreateSection("Core Features");
 
-local visualtab = window:CreateTab({
-    Name = "Visuals", 
-    Icon = "👁️"
-});
-
-local playertab = window:CreateTab({
-    Name = "Player",
-    Icon = "🏃"
-});
-
-local misctab = window:CreateTab({
-    Name = "Misc",
-    Icon = "🔧"
-});
-
-local settingstab = window:CreateTab({
-    Name = "Settings",
-    Icon = "⚙️"
-});
-
-local configtab = window:CreateTab({
-    Name = "Config",
-    Icon = "💾"
-});
-
--- // MAIN TAB
-maintab:AddSeparator("Core Features");
-
-local autofarm = components:AddToggle(maintab.content, {
-    Text = "Auto Farm",
+components:AddToggle(coresect, {
+    Text = "Auto Clicker",
+    Description = "Automatically clicks for you",
     Default = false,
-    Callback = function(state)
-        print("Auto Farm:", state);
-    end
-});
-
-components:AddSlider(maintab.content, {
-    Text = "Farm Speed",
-    Min = 1,
-    Max = 20,
-    Default = 10,
-    Suffix = "x",
     Callback = function(value)
-        print("Farm Speed:", value);
+        autoclick = value;
+        print("auto clicker:", value);
     end
 });
 
-components:AddToggle(maintab.content, {
-    Text = "Auto Collect",
-    Default = true,
-    Callback = function(state)
-        print("Auto Collect:", state);
-    end
-});
-
-maintab:AddSeparator("Protection");
-
-components:AddToggle(maintab.content, {
-    Text = "Anti AFK",
-    Default = true,
-    Callback = function(state)
-        print("Anti AFK:", state);
-    end
-});
-
-components:AddToggle(maintab.content, {
-    Text = "Safe Mode",
+components:AddToggle(coresect, {
+    Text = "Speed Hack",
+    Description = "Increases movement speed",
     Default = false,
-    Callback = function(state)
-        print("Safe Mode:", state);
-    end
-});
-
--- // COMBAT TAB
-combattab:AddSeparator("Aimbot");
-
-components:AddToggle(combattab.content, {
-    Text = "Aimbot",
-    Default = false,
-    Callback = function(state)
-        print("Aimbot:", state);
-    end
-});
-
-components:AddSlider(combattab.content, {
-    Text = "FOV Size",
-    Min = 50,
-    Max = 500,
-    Default = 200,
-    Suffix = "px",
     Callback = function(value)
-        print("FOV:", value);
+        if value then
+            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = walkspeed;
+        else
+            game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16;
+        end;
     end
 });
 
-components:AddSlider(combattab.content, {
-    Text = "Smoothing",
-    Min = 1,
-    Max = 10,
-    Default = 5,
-    Suffix = "",
-    Callback = function(value)
-        print("Smoothing:", value);
-    end
-});
-
-combattab:AddSeparator("Combat Assists");
-
-components:AddToggle(combattab.content, {
-    Text = "Silent Aim",
-    Default = false,
-    Callback = function(state)
-        print("Silent Aim:", state);
-    end
-});
-
-extensions:AddDropdown(combattab.content, {
-    Text = "Target Part",
-    Options = {"Head", "Torso", "Random"},
-    Default = "Head",
-    Callback = function(selected)
-        print("Target Part:", selected);
-    end
-});
-
--- // VISUALS TAB
-visualtab:AddSeparator("ESP");
-
-components:AddToggle(visualtab.content, {
-    Text = "Player ESP",
-    Default = false,
-    Callback = function(state)
-        print("Player ESP:", state);
-    end
-});
-
-components:AddToggle(visualtab.content, {
-    Text = "Name Tags",
-    Default = true,
-    Callback = function(state)
-        print("Name Tags:", state);
-    end
-});
-
-components:AddToggle(visualtab.content, {
-    Text = "Health Bars",
-    Default = false,
-    Callback = function(state)
-        print("Health Bars:", state);
-    end
-});
-
-visualtab:AddSeparator("Customization");
-
-extensions:AddColorPicker(visualtab.content, {
-    Text = "ESP Color",
-    Default = Color3.fromRGB(255, 105, 180),
-    Callback = function(color)
-        print("ESP Color:", color);
-    end
-});
-
-components:AddSlider(visualtab.content, {
-    Text = "ESP Transparency",
-    Min = 0,
-    Max = 100,
-    Default = 50,
-    Suffix = "%",
-    Callback = function(value)
-        print("ESP Transparency:", value);
-    end
-});
-
--- // PLAYER TAB
-playertab:AddSeparator("Movement");
-
-components:AddSlider(playertab.content, {
+components:AddSlider(coresect, {
     Text = "Walk Speed",
+    Description = "Adjust your movement speed",
     Min = 16,
-    Max = 200,
+    Max = 500,
     Default = 16,
-    Suffix = "",
+    Increment = 1,
     Callback = function(value)
-        print("Walk Speed:", value);
-        if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+        walkspeed = value;
+        if game.Players.LocalPlayer.Character then
             game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value;
         end;
     end
 });
 
-components:AddSlider(playertab.content, {
+components:AddButton(coresect, {
+    Text = "Teleport to Spawn",
+    Description = "Returns you to the spawn location",
+    Callback = function()
+        local plr = game.Players.LocalPlayer;
+        if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            plr.Character.HumanoidRootPart.CFrame = CFrame.new(0, 50, 0);
+        end;
+    end
+});
+
+-- // automation section  
+local autosect = maintab:CreateSection("Automation");
+
+components:AddToggle(autosect, {
+    Text = "Auto Farm",
+    Description = "Automatically farms resources",
+    Default = false,
+    Callback = function(value)
+        print("auto farm:", value);
+    end
+});
+
+components:AddToggle(autosect, {
+    Text = "Auto Collect",
+    Description = "Collects items automatically",
+    Default = false,
+    Callback = function(value)
+        print("auto collect:", value);
+    end
+});
+
+components:AddSeparator(autosect);
+
+components:AddInput(autosect, {
+    Text = "Target Username",
+    Description = "Enter username to target",
+    Placeholder = "Enter username...",
+    Callback = function(text)
+        print("target username:", text);
+    end
+});
+
+-- // combat tab
+local combattab = win:CreateTab({
+    Name = "Combat",
+    Icon = "⚔️"
+});
+
+-- // combat features
+local combatsect = combattab:CreateSection("Combat Features");
+
+components:AddToggle(combatsect, {
+    Text = "Aimbot",
+    Description = "Automatically aims at enemies",
+    Default = false,
+    Callback = function(value)
+        print("aimbot:", value);
+    end
+});
+
+components:AddToggle(combatsect, {
+    Text = "Kill Aura",
+    Description = "Attacks nearby enemies",
+    Default = false,
+    Callback = function(value)
+        print("kill aura:", value);
+    end
+});
+
+components:AddSlider(combatsect, {
+    Text = "Attack Range",
+    Description = "Set attack distance",
+    Min = 5,
+    Max = 50,
+    Default = 15,
+    Increment = 1,
+    Callback = function(value)
+        print("attack range:", value);
+    end
+});
+
+-- // weapon settings
+local weaponsect = combattab:CreateSection("Weapon Settings");
+
+extensions:AddDropdown(weaponsect, {
+    Text = "Weapon Type",
+    Description = "Select your weapon",
+    Options = {"Sword", "Bow", "Staff", "Dagger"},
+    Default = "Sword",
+    Callback = function(option)
+        print("weapon type:", option);
+    end
+});
+
+components:AddSlider(weaponsect, {
+    Text = "Damage Multiplier",
+    Description = "Increase damage output",
+    Min = 1,
+    Max = 10,
+    Default = 1,
+    Increment = 0.1,
+    Callback = function(value)
+        print("damage multiplier:", value);
+    end
+});
+
+-- // visuals tab
+local visualstab = win:CreateTab({
+    Name = "Visuals",
+    Icon = "👁️"
+});
+
+-- // esp section
+local espsect = visualstab:CreateSection("ESP Features");
+
+components:AddToggle(espsect, {
+    Text = "Player ESP",
+    Description = "See players through walls",
+    Default = false,
+    Callback = function(value)
+        espplayers = value;
+        print("player esp:", value);
+    end
+});
+
+components:AddToggle(espsect, {
+    Text = "Item ESP",
+    Description = "Highlight valuable items",
+    Default = false,
+    Callback = function(value)
+        print("item esp:", value);
+    end
+});
+
+extensions:AddColorPicker(espsect, {
+    Text = "ESP Color",
+    Description = "Choose ESP highlight color",
+    Default = Color3.fromRGB(255, 105, 180),
+    Callback = function(color)
+        print("esp color:", color);
+    end
+});
+
+-- // visual effects
+local vfxsect = visualstab:CreateSection("Visual Effects");
+
+components:AddToggle(vfxsect, {
+    Text = "Wallhack",
+    Description = "See through walls",
+    Default = false,
+    Callback = function(value)
+        wallhack = value;
+        print("wallhack:", value);
+    end
+});
+
+components:AddToggle(vfxsect, {
+    Text = "Full Bright",
+    Description = "Remove darkness",
+    Default = false,
+    Callback = function(value)
+        if value then
+            game.Lighting.Brightness = 3;
+            game.Lighting.Ambient = Color3.fromRGB(255, 255, 255);
+        else
+            game.Lighting.Brightness = 1;
+            game.Lighting.Ambient = Color3.fromRGB(70, 70, 70);
+        end;
+    end
+});
+
+components:AddSlider(vfxsect, {
+    Text = "FOV",
+    Description = "Adjust field of view",
+    Min = 70,
+    Max = 120,
+    Default = 70,
+    Increment = 1,
+    Callback = function(value)
+        game.Workspace.CurrentCamera.FieldOfView = value;
+    end
+});
+
+-- // player tab
+local playertab = win:CreateTab({
+    Name = "Player",
+    Icon = "👤"
+});
+
+-- // movement section
+local movesect = playertab:CreateSection("Movement");
+
+components:AddSlider(movesect, {
     Text = "Jump Power",
+    Description = "How high you can jump",
     Min = 50,
     Max = 300,
     Default = 50,
-    Suffix = "",
+    Increment = 5,
     Callback = function(value)
-        print("Jump Power:", value);
-        if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+        jumppower = value;
+        if game.Players.LocalPlayer.Character then
             game.Players.LocalPlayer.Character.Humanoid.JumpPower = value;
         end;
     end
 });
 
-playertab:AddSeparator("Abilities");
-
-components:AddToggle(playertab.content, {
+components:AddToggle(movesect, {
     Text = "Infinite Jump",
+    Description = "Jump unlimited times",
     Default = false,
-    Callback = function(state)
-        print("Infinite Jump:", state);
+    Callback = function(value)
+        print("infinite jump:", value);
     end
 });
 
-components:AddToggle(playertab.content, {
-    Text = "Noclip",
+components:AddToggle(movesect, {
+    Text = "No Clip",
+    Description = "Walk through walls",
     Default = false,
-    Callback = function(state)
-        print("Noclip:", state);
+    Callback = function(value)
+        print("no clip:", value);
     end
 });
 
-extensions:AddKeyBind(playertab.content, {
-    Text = "Fly Toggle",
-    Default = Enum.KeyCode.F,
+-- // character section
+local charsect = playertab:CreateSection("Character");
+
+components:AddToggle(charsect, {
+    Text = "Infinite Health",
+    Description = "Never take damage",
+    Default = false,
+    Callback = function(value)
+        infinitehealth = value;
+        print("infinite health:", value);
+    end
+});
+
+components:AddButton(charsect, {
+    Text = "Reset Character",
+    Description = "Respawn your character",
     Callback = function()
-        print("Fly toggled!");
+        game.Players.LocalPlayer.Character.Humanoid.Health = 0;
     end
 });
 
--- // MISC TAB
-misctab:AddSeparator("Utilities");
-
-components:AddButton(misctab.content, {
-    Text = "Rejoin Server",
+components:AddButton(charsect, {
+    Text = "Invisible",
+    Description = "Make yourself invisible",
     Callback = function()
-        game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer);
+        local plr = game.Players.LocalPlayer;
+        if plr.Character then
+            for _, part in pairs(plr.Character:GetChildren()) do
+                if part:IsA("BasePart") then
+                    part.Transparency = 1;
+                end;
+            end;
+        end;
     end
 });
 
-components:AddButton(misctab.content, {
-    Text = "Copy Game Link",
+-- // misc tab
+local misctab = win:CreateTab({
+    Name = "Misc",
+    Icon = "🔧"
+});
+
+-- // utility section
+local utilsect = misctab:CreateSection("Utilities");
+
+extensions:AddKeybind(utilsect, {
+    Text = "Toggle UI",
+    Description = "Show/hide the interface",
+    Default = Enum.KeyCode.RightShift,
+    Callback = function(key)
+        print("toggle ui key:", key);
+    end
+});
+
+components:AddLabel(utilsect, {
+    Text = "Server Stats",
+    Description = "Current server information"
+});
+
+components:AddButton(utilsect, {
+    Text = "Copy Invite Link",
+    Description = "Copy server join link",
     Callback = function()
         setclipboard("https://www.roblox.com/games/" .. game.PlaceId);
-        print("Game link copied!");
+        print("copied invite link");
     end
 });
 
-misctab:AddSeparator("Information");
+-- // anti-detection
+local antisect = misctab:CreateSection("Anti-Detection");
 
-components:AddLabel(misctab.content, {
-    Text = "Game: " .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
-    Size = 13,
-    Color = Color3.fromRGB(120, 120, 125)
+components:AddToggle(antisect, {
+    Text = "Anti-Ban",
+    Description = "Reduce detection risk",
+    Default = true,
+    Callback = function(value)
+        print("anti-ban:", value);
+    end
 });
 
-components:AddLabel(misctab.content, {
-    Text = "Players: " .. #game.Players:GetPlayers() .. "/12",
-    Size = 13,
-    Color = Color3.fromRGB(120, 120, 125)
+components:AddToggle(antisect, {
+    Text = "Stealth Mode",
+    Description = "Hide exploit activities",
+    Default = false,
+    Callback = function(value)
+        print("stealth mode:", value);
+    end
 });
 
--- // SETTINGS TAB
-settingstab:AddSeparator("Interface");
+-- // settings tab
+local settingstab = win:CreateTab({
+    Name = "Settings",
+    Icon = "⚙️"
+});
 
-components:AddSlider(settingstab.content, {
+-- // ui settings
+local uisect = settingstab:CreateSection("UI Settings");
+
+extensions:AddDropdown(uisect, {
+    Text = "Theme",
+    Description = "Choose UI theme",
+    Options = {"Pink Dark", "Pink Light", "Classic", "Neon"},
+    Default = "Pink Dark",
+    Callback = function(option)
+        print("theme:", option);
+    end
+});
+
+components:AddSlider(uisect, {
     Text = "UI Scale",
+    Description = "Adjust interface size",
     Min = 0.8,
     Max = 1.5,
     Default = 1.0,
-    Suffix = "x",
+    Increment = 0.1,
     Callback = function(value)
-        print("UI Scale:", value);
+        print("ui scale:", value);
     end
 });
 
-components:AddToggle(settingstab.content, {
-    Text = "Notifications",
+components:AddToggle(uisect, {
+    Text = "Animations",
+    Description = "Enable smooth animations",
     Default = true,
-    Callback = function(state)
-        print("Notifications:", state);
+    Callback = function(value)
+        print("animations:", value);
     end
 });
 
-settingstab:AddSeparator("Performance");
+-- // performance settings
+local perfsect = settingstab:CreateSection("Performance");
 
-extensions:AddDropdown(settingstab.content, {
-    Text = "Render Quality",
-    Options = {"Low", "Medium", "High", "Ultra"},
-    Default = "High",
-    Callback = function(selected)
-        print("Render Quality:", selected);
-    end
-});
-
-components:AddSlider(settingstab.content, {
-    Text = "Max FPS",
+components:AddSlider(perfsect, {
+    Text = "FPS Limit",
+    Description = "Cap frame rate",
     Min = 30,
     Max = 240,
     Default = 60,
-    Suffix = " fps",
+    Increment = 10,
     Callback = function(value)
-        print("Max FPS:", value);
+        setfpscap(value);
     end
 });
 
--- // CONFIG TAB
-configtab:AddSeparator("Configuration");
+components:AddToggle(perfsect, {
+    Text = "Low Graphics",
+    Description = "Reduce visual quality",
+    Default = false,
+    Callback = function(value)
+        if value then
+            settings().Rendering.QualityLevel = 1;
+        else
+            settings().Rendering.QualityLevel = 21;
+        end;
+    end
+});
 
-components:AddInput(configtab.content, {
+-- // config tab
+local configtab = win:CreateTab({
+    Name = "Config",
+    Icon = "📁"
+});
+
+-- // config management
+local configsect = configtab:CreateSection("Configuration");
+
+components:AddInput(configsect, {
     Text = "Config Name",
+    Description = "Name for your configuration",
     Placeholder = "Enter config name...",
     Callback = function(text)
-        print("Config Name:", text);
+        currentconfig = text;
     end
 });
 
-components:AddButton(configtab.content, {
-    Text = "Save Configuration",
+components:AddButton(configsect, {
+    Text = "Save Config",
+    Description = "Save current settings",
     Callback = function()
-        print("Configuration saved!");
+        print("saving config:", currentconfig);
+        -- // save logic here
     end
 });
 
-components:AddButton(configtab.content, {
-    Text = "Load Configuration", 
+components:AddButton(configsect, {
+    Text = "Load Config",
+    Description = "Load saved settings",
     Callback = function()
-        print("Configuration loaded!");
+        print("loading config:", currentconfig);
+        -- // load logic here  
     end
 });
 
-configtab:AddSeparator("Reset");
+components:AddSeparator(configsect);
 
-components:AddButton(configtab.content, {
-    Text = "Reset to Defaults",
+extensions:AddDropdown(configsect, {
+    Text = "Saved Configs",
+    Description = "Select a saved configuration",
+    Options = {"default", "combat", "farming", "stealth"},
+    Default = "default",
+    Callback = function(option)
+        currentconfig = option;
+        print("selected config:", option);
+    end
+});
+
+-- // info section
+local infosect = configtab:CreateSection("Information");
+
+components:AddLabel(infosect, {
+    Text = "Version: 2.1.0",
+    Description = "Current script version"
+});
+
+components:AddLabel(infosect, {
+    Text = "Developer: testing2122",
+    Description = "Created by testing2122"
+});
+
+components:AddButton(infosect, {
+    Text = "Join Discord",
+    Description = "Get support and updates",
     Callback = function()
-        print("Settings reset to defaults!");
-        autofarm:SetValue(false);
+        setclipboard("https://discord.gg/testing2122");
+        print("discord link copied");
     end
 });
 
--- // startup message
-components:AddLabel(maintab.content, {
-    Text = "Welcome to INSANITY! Premium scripting experience.",
-    Size = 12,
-    Color = Color3.fromRGB(255, 150, 200)
-});
-
-print("🌸 Pink UI Demo loaded successfully!");
-print("📁 Repository: https://github.com/testing2122/roblox-pink-ui-lib");
-print("✨ Features: Scrollable tabs, modern design, and premium aesthetics");
+print("pink ui loaded successfully");
+print("press right shift to toggle ui");
