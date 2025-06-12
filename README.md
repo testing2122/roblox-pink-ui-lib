@@ -1,231 +1,254 @@
-# 🌸 Pink UI Library
+# Pink UI Library v2.0 🌸
 
-A sleek, modern UI library for Roblox with a black, grey, and pink theme. Features smooth animations, reactive components, and an intuitive tabbed interface.
+A modern, sleek UI library for Roblox with a beautiful pink/black theme and smooth animations.
 
 ## ✨ Features
 
-- **Modern Design**: Clean black, grey, and pink color scheme
-- **Reactive Components**: Smooth hover effects and animations
-- **Tab System**: Left-side navigation with animated transitions
-- **Draggable Windows**: Smooth tween-based dragging
-- **Rich Components**: Buttons, toggles, sliders, inputs, dropdowns, color pickers, and more
-- **Optimized Performance**: Efficient code with minimal overhead
-- **Easy Integration**: Simple API for quick implementation
+- **Box System**: Create scrollable boxes in left/right columns
+- **Animated Gradient Title**: Toggle with the "G" button
+- **Modern Design**: Pink/black theme with smooth transitions
+- **Responsive Layout**: Scrollable columns and containers
+- **Rich Components**: Toggles, sliders, buttons, inputs, dropdowns, labels
+- **Easy to Use**: Simple API with customizable options
 
 ## 🚀 Quick Start
 
 ```lua
--- Load the library
-local pnkui = loadstring(game:HttpGet("https://raw.githubusercontent.com/testing2122/roblox-pink-ui-lib/main/PinkUI.lua"))();
-local components = loadstring(game:HttpGet("https://raw.githubusercontent.com/testing2122/roblox-pink-ui-lib/main/Components.lua"))();
+-- Load the libraries
+local PinkUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/testing2122/roblox-pink-ui-lib/main/PinkUI.lua"))();
+local Components = loadstring(game:HttpGet("https://raw.githubusercontent.com/testing2122/roblox-pink-ui-lib/main/Components.lua"))();
 
--- Create a window
-local window = pnkui:CreateWindow({
+-- Create window
+local Window = PinkUI:CreateWindow({
     Title = "My Script",
-    Subtitle = "v1.0.0"
+    Subtitle = "v1.0",
+    TitleGradient = true
 });
 
--- Create a tab
-local tab = window:CreateTab({
+-- Create tab
+local MainTab = Window:CreateTab({
     Name = "Main",
     Icon = "🏠"
 });
 
--- Add components
-components:AddButton(tab.content, {
-    Text = "Click Me!",
-    Callback = function()
-        print("Button clicked!");
-    end
+-- Create boxes in columns
+local LeftBox = MainTab:CreateBox({
+    Name = "Features",
+    Column = "left",
+    Height = 300
 });
-```
 
-## 📦 Components
-
-### Basic Components
-- **Button**: Interactive buttons with hover effects
-- **Toggle**: On/off switches with smooth animations
-- **Slider**: Value sliders with customizable ranges
-- **Input**: Text input fields with focus effects
-- **Label**: Static text displays with customizable styling
-
-### Advanced Components (Extensions.lua)
-- **Dropdown**: Expandable selection menus
-- **Color Picker**: Interactive color selection
-- **Key Bind**: Keyboard input binding
-- **Separator**: Visual dividers with optional text
-
-## 🎨 Color Scheme
-
-```lua
-local colors = {
-    bg = Color3.fromRGB(15, 15, 15),        -- Main background
-    secondary = Color3.fromRGB(35, 35, 35),  -- Secondary elements
-    accent = Color3.fromRGB(60, 60, 60),     -- Accent elements
-    pink = Color3.fromRGB(255, 105, 180),    -- Primary pink
-    darkpink = Color3.fromRGB(200, 80, 140), -- Darker pink
-    white = Color3.fromRGB(255, 255, 255),   -- Text color
-    separator = Color3.fromRGB(80, 80, 80)   -- Divider lines
-};
-```
-
-## 📖 API Reference
-
-### Window Creation
-```lua
-local window = pnkui:CreateWindow({
-    Title = "Window Title",     -- Optional: Window title
-    Subtitle = "Subtitle text"  -- Optional: Subtitle text
+local RightBox = MainTab:CreateBox({
+    Name = "Settings", 
+    Column = "right",
+    Height = 250
 });
-```
 
-### Tab Creation
-```lua
-local tab = window:CreateTab({
-    Name = "Tab Name",  -- Tab display name
-    Icon = "🏠"        -- Optional: Tab icon (emoji)
-});
-```
-
-### Adding Components
-
-#### Button
-```lua
-components:AddButton(parent, {
-    Text = "Button Text",
-    Callback = function()
-        -- Button click logic
-    end
-});
-```
-
-#### Toggle
-```lua
-local toggle = components:AddToggle(parent, {
-    Text = "Toggle Text",
+-- Add components to boxes
+Components:AddToggle(LeftBox, {
+    Name = "Auto Farm",
+    Description = "Automatically farm resources",
     Default = false,
-    Callback = function(state)
-        print("Toggle:", state);
+    Callback = function(value)
+        print("Auto Farm:", value);
+    end
+});
+
+Components:AddSlider(RightBox, {
+    Name = "Speed",
+    Min = 1,
+    Max = 100,
+    Default = 16,
+    Callback = function(value)
+        print("Speed:", value);
     end
 });
 ```
 
-#### Slider
+## 📦 Box System
+
+The new box system allows you to create organized, scrollable containers:
+
+### Creating Boxes
 ```lua
-local slider = components:AddSlider(parent, {
-    Text = "Slider Text",
+local MyBox = tab:CreateBox({
+    Name = "Box Title",        -- Box header text
+    Column = "left",           -- "left" or "right" column
+    Height = 300               -- Box height in pixels
+});
+```
+
+### Box Features
+- **Left/Right Columns**: Position boxes in either column
+- **Custom Heights**: Set any height for each box
+- **Scrollable Content**: Boxes scroll when content overflows
+- **Multiple Boxes**: Stack multiple boxes in the same column
+- **Pink Styling**: Consistent theme with pink outlines
+
+## 🎛️ Components
+
+All components are added directly to boxes:
+
+### Toggle
+```lua
+Components:AddToggle(box, {
+    Name = "Feature Name",
+    Description = "Optional description",
+    Default = false,
+    Callback = function(value) end
+});
+```
+
+### Slider
+```lua
+Components:AddSlider(box, {
+    Name = "Slider Name",
+    Description = "Optional description", 
     Min = 0,
     Max = 100,
     Default = 50,
-    Suffix = "%",
-    Callback = function(value)
-        print("Value:", value);
-    end
+    Increment = 1,
+    Callback = function(value) end
 });
 ```
 
-#### Input
+### Button
 ```lua
-local input = components:AddInput(parent, {
-    Text = "Input Label",
+Components:AddButton(box, {
+    Name = "Button Text",
+    Description = "Optional description",
+    Callback = function() end
+});
+```
+
+### Input
+```lua
+Components:AddInput(box, {
+    Name = "Input Name",
+    Description = "Optional description",
     Placeholder = "Enter text...",
-    Callback = function(text)
-        print("Input:", text);
-    end
+    Default = "",
+    Callback = function(text) end
 });
 ```
 
-#### Dropdown (Extensions)
+### Dropdown
 ```lua
-local extensions = loadstring(game:HttpGet("https://raw.githubusercontent.com/testing2122/roblox-pink-ui-lib/main/Extensions.lua"))();
-
-local dropdown = extensions:AddDropdown(parent, {
-    Text = "Select Option",
+Components:AddDropdown(box, {
+    Name = "Dropdown Name",
+    Description = "Optional description",
     Options = {"Option 1", "Option 2", "Option 3"},
     Default = "Option 1",
-    Callback = function(selected)
-        print("Selected:", selected);
-    end
+    Callback = function(selected) end
 });
 ```
 
-#### Color Picker (Extensions)
+### Label
 ```lua
-local colorpicker = extensions:AddColorPicker(parent, {
-    Text = "Choose Color",
-    Default = Color3.fromRGB(255, 105, 180),
-    Callback = function(color)
-        print("Color:", color);
-    end
+Components:AddLabel(box, {
+    Text = "Label text",
+    Size = 14,
+    Color = Color3.fromRGB(255, 255, 255)
 });
-```
-
-#### Key Bind (Extensions)
-```lua
-local keybind = extensions:AddKeyBind(parent, {
-    Text = "Toggle Key",
-    Default = Enum.KeyCode.F,
-    Callback = function()
-        print("Key pressed!");
-    end
-});
-```
-
-## 🎯 Component Methods
-
-Most components return a table with utility methods:
-
-```lua
--- Set component value
-component:SetValue(newValue);
-
--- Get current value
-local value = component:GetValue();
-
--- For labels specifically
-label:SetText("New text");
-label:SetColor(Color3.fromRGB(255, 0, 0));
-```
-
-## 🔧 Advanced Usage
-
-### Adding Separators
-```lua
-tab:AddSeparator("Section Name");  -- With text
-tab:AddSeparator();                -- Line only
-```
-
-### Window Management
-```lua
--- The window automatically handles:
--- - Dragging via title bar
--- - Close button functionality
--- - Tab switching animations
--- - Responsive sizing
 ```
 
 ## 🎨 Customization
 
-The library uses consistent color schemes and animation timings that can be modified in the source files:
+### Window Options
+```lua
+local Window = PinkUI:CreateWindow({
+    Title = "Window Title",           -- Main title
+    Subtitle = "Subtitle text",       -- Subtitle below title
+    TitleGradient = true             -- Enable animated gradient (default: true)
+});
+```
 
-- **Colors**: Modify the `clrs` table in each file
-- **Animations**: Adjust the `twinfo` table for different timing
-- **Sizing**: Most components use relative sizing for responsiveness
+### Tab Options
+```lua
+local Tab = Window:CreateTab({
+    Name = "Tab Name",               -- Tab display name
+    Icon = "🏠"                     -- Optional emoji icon
+});
+```
 
-## 📱 Compatibility
+## 🔧 Advanced Usage
 
-- **Roblox Executors**: Compatible with most modern executors
-- **Screen Sizes**: Responsive design works across different resolutions
-- **Performance**: Optimized for smooth 60+ FPS operation
+### Component Methods
+Most components return objects with methods:
 
-## 🤝 Contributing
+```lua
+local toggle = Components:AddToggle(box, {...});
+toggle.SetValue(true);              -- Set value
+local value = toggle.GetValue();    -- Get current value
 
-Feel free to contribute improvements, bug fixes, or new components!
+local slider = Components:AddSlider(box, {...});
+slider.SetValue(75);
+local value = slider.GetValue();
+
+local dropdown = Components:AddDropdown(box, {...});
+dropdown.SetValue("Option 2");
+dropdown.SetOptions({"New", "Options"});
+```
+
+### Gradient Control
+- Click the **"G" button** next to minimize/close to toggle title gradient
+- Gradient smoothly animates left-to-right with pink colors
+- Can be disabled in window creation or toggled at runtime
+
+## 📱 Layout System
+
+The library uses a **two-column layout**:
+- **Left Column**: 48% width, positioned at left
+- **Right Column**: 48% width, positioned at right  
+- **Scrollable**: Both columns scroll independently
+- **Responsive**: Boxes stack vertically within columns
+- **Spacing**: Automatic spacing between boxes
+
+## 🎯 Migration from v1.x
+
+If upgrading from older versions:
+
+**Old (v1.x):**
+```lua
+local section = tab:CreateSection("Section Name");
+Components:AddToggle(section, {...});
+```
+
+**New (v2.0):**
+```lua
+local box = tab:CreateBox({
+    Name = "Section Name",
+    Column = "left",
+    Height = 300
+});
+Components:AddToggle(box, {...});
+```
+
+## 📋 Example
+
+See [Example.lua](Example.lua) for a complete working example with multiple tabs, boxes, and all component types.
+
+## 🐛 Troubleshooting
+
+**Error: "attempt to call missing method 'CreateSection'"**
+- You're using old v1.x syntax
+- Replace `CreateSection()` with `CreateBox()`
+- Update your component calls to use boxes instead of sections
+
+**Components not showing:**
+- Make sure you're adding components to the box, not the tab
+- Verify the box was created successfully
+- Check that Components library is loaded
+
+**Gradient not working:**
+- Ensure `TitleGradient = true` in window creation
+- Try toggling with the "G" button
+- Check console for any errors
 
 ## 📄 License
 
-This project is open source and available under the MIT License.
+MIT License - Feel free to use in your projects!
 
 ---
 
-**Created by testing2122** • [GitHub Repository](https://github.com/testing2122/roblox-pink-ui-lib)
+**Created by testing2122** | [GitHub Repository](https://github.com/testing2122/roblox-pink-ui-lib)
