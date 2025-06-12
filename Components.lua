@@ -30,7 +30,7 @@ local function createtween(obj, info, props)
     return tweenserv:Create(obj, info, props);
 end;
 
--- // TOGGLE
+-- // TOGGLE with box
 function components:AddToggle(parent, cfg)
     local cfg = cfg or {};
     local text = cfg.Text or "Toggle";
@@ -39,14 +39,26 @@ function components:AddToggle(parent, cfg)
     local callback = cfg.Callback or function() end;
     
     local toggleframe = Instance.new("Frame");
-    toggleframe.Size = UDim2.new(1, 0, 0, desc ~= "" and 65 or 45);
-    toggleframe.BackgroundTransparency = 1;
+    toggleframe.Size = UDim2.new(1, 0, 0, desc ~= "" and 75 or 55);
+    toggleframe.BackgroundColor3 = clrs.secondary;
+    toggleframe.BackgroundTransparency = 0.1;
+    toggleframe.BorderSizePixel = 0;
     toggleframe.Parent = parent;
+    
+    local corner = Instance.new("UICorner");
+    corner.CornerRadius = UDim.new(0, 8);
+    corner.Parent = toggleframe;
+    
+    local stroke = Instance.new("UIStroke");
+    stroke.Color = clrs.pink;
+    stroke.Thickness = 1;
+    stroke.Transparency = 0.8;
+    stroke.Parent = toggleframe;
     
     -- // toggle bg (grey rectangle)
     local togglebg = Instance.new("Frame");
     togglebg.Size = UDim2.new(0, 45, 0, 22);
-    togglebg.Position = UDim2.new(1, -50, 0, desc ~= "" and 22 or 12);
+    togglebg.Position = UDim2.new(1, -55, 0, desc ~= "" and 25 or 15);
     togglebg.BackgroundColor3 = clrs.darkgrey;
     togglebg.BorderSizePixel = 0;
     togglebg.Parent = toggleframe;
@@ -70,15 +82,15 @@ function components:AddToggle(parent, cfg)
     -- // toggle button
     local togglebtn = Instance.new("TextButton");
     togglebtn.Size = UDim2.new(0, 45, 0, 22);
-    togglebtn.Position = UDim2.new(1, -50, 0, desc ~= "" and 22 or 12);
+    togglebtn.Position = UDim2.new(1, -55, 0, desc ~= "" and 25 or 15);
     togglebtn.BackgroundTransparency = 1;
     togglebtn.Text = "";
     togglebtn.Parent = toggleframe;
     
     -- // main label
     local mainlbl = Instance.new("TextLabel");
-    mainlbl.Size = UDim2.new(1, -60, 0, 20);
-    mainlbl.Position = UDim2.new(0, 0, 0, desc ~= "" and 18 or 12);
+    mainlbl.Size = UDim2.new(1, -70, 0, 20);
+    mainlbl.Position = UDim2.new(0, 10, 0, desc ~= "" and 18 or 12);
     mainlbl.BackgroundTransparency = 1;
     mainlbl.Text = text;
     mainlbl.TextColor3 = clrs.white;
@@ -90,8 +102,8 @@ function components:AddToggle(parent, cfg)
     -- // description
     if desc ~= "" then
         local desclbl = Instance.new("TextLabel");
-        desclbl.Size = UDim2.new(1, -60, 0, 16);
-        desclbl.Position = UDim2.new(0, 0, 0, 38);
+        desclbl.Size = UDim2.new(1, -70, 0, 16);
+        desclbl.Position = UDim2.new(0, 10, 0, 38);
         desclbl.BackgroundTransparency = 1;
         desclbl.Text = desc;
         desclbl.TextColor3 = clrs.grey;
@@ -144,7 +156,7 @@ function components:AddToggle(parent, cfg)
     };
 end;
 
--- // BUTTON (fixed hover state bug)
+-- // BUTTON with box
 function components:AddButton(parent, cfg)
     local cfg = cfg or {};
     local text = cfg.Text or "Button";
@@ -152,13 +164,25 @@ function components:AddButton(parent, cfg)
     local callback = cfg.Callback or function() end;
     
     local btnframe = Instance.new("Frame");
-    btnframe.Size = UDim2.new(1, 0, 0, desc ~= "" and 70 or 45);
-    btnframe.BackgroundTransparency = 1;
+    btnframe.Size = UDim2.new(1, 0, 0, desc ~= "" and 75 or 55);
+    btnframe.BackgroundColor3 = clrs.secondary;
+    btnframe.BackgroundTransparency = 0.1;
+    btnframe.BorderSizePixel = 0;
     btnframe.Parent = parent;
     
+    local corner = Instance.new("UICorner");
+    corner.CornerRadius = UDim.new(0, 8);
+    corner.Parent = btnframe;
+    
+    local stroke = Instance.new("UIStroke");
+    stroke.Color = clrs.pink;
+    stroke.Thickness = 1;
+    stroke.Transparency = 0.8;
+    stroke.Parent = btnframe;
+    
     local btn = Instance.new("TextButton");
-    btn.Size = UDim2.new(1, 0, 0, 35);
-    btn.Position = UDim2.new(0, 0, 0, desc ~= "" and 25 or 5);
+    btn.Size = UDim2.new(1, -20, 0, 30);
+    btn.Position = UDim2.new(0, 10, 1, desc ~= "" and -40 or -35);
     btn.BackgroundColor3 = clrs.accent;
     btn.BorderSizePixel = 0;
     btn.Text = text;
@@ -168,7 +192,7 @@ function components:AddButton(parent, cfg)
     btn.Parent = btnframe;
     
     local btncorner = Instance.new("UICorner");
-    btncorner.CornerRadius = UDim.new(0, 8);
+    btncorner.CornerRadius = UDim.new(0, 6);
     btncorner.Parent = btn;
     
     local btnstroke = Instance.new("UIStroke");
@@ -177,11 +201,23 @@ function components:AddButton(parent, cfg)
     btnstroke.Transparency = 0.8;
     btnstroke.Parent = btn;
     
+    -- // main label
+    local mainlbl = Instance.new("TextLabel");
+    mainlbl.Size = UDim2.new(1, -20, 0, 20);
+    mainlbl.Position = UDim2.new(0, 10, 0, desc ~= "" and 18 or 12);
+    mainlbl.BackgroundTransparency = 1;
+    mainlbl.Text = text;
+    mainlbl.TextColor3 = clrs.white;
+    mainlbl.TextSize = 14;
+    mainlbl.Font = Enum.Font.GothamMedium;
+    mainlbl.TextXAlignment = Enum.TextXAlignment.Left;
+    mainlbl.Parent = btnframe;
+    
     -- // description
     if desc ~= "" then
         local desclbl = Instance.new("TextLabel");
-        desclbl.Size = UDim2.new(1, 0, 0, 16);
-        desclbl.Position = UDim2.new(0, 0, 0, 5);
+        desclbl.Size = UDim2.new(1, -20, 0, 16);
+        desclbl.Position = UDim2.new(0, 10, 0, 38);
         desclbl.BackgroundTransparency = 1;
         desclbl.Text = desc;
         desclbl.TextColor3 = clrs.grey;
@@ -234,11 +270,12 @@ function components:AddButton(parent, cfg)
     return {
         SetText = function(newtext)
             btn.Text = newtext;
+            mainlbl.Text = newtext;
         end
     };
 end;
 
--- // SLIDER
+-- // SLIDER with box
 function components:AddSlider(parent, cfg)
     local cfg = cfg or {};
     local text = cfg.Text or "Slider";
@@ -250,14 +287,26 @@ function components:AddSlider(parent, cfg)
     local callback = cfg.Callback or function() end;
     
     local sliderframe = Instance.new("Frame");
-    sliderframe.Size = UDim2.new(1, 0, 0, desc ~= "" and 75 or 55);
-    sliderframe.BackgroundTransparency = 1;
+    sliderframe.Size = UDim2.new(1, 0, 0, desc ~= "" and 85 or 65);
+    sliderframe.BackgroundColor3 = clrs.secondary;
+    sliderframe.BackgroundTransparency = 0.1;
+    sliderframe.BorderSizePixel = 0;
     sliderframe.Parent = parent;
+    
+    local corner = Instance.new("UICorner");
+    corner.CornerRadius = UDim.new(0, 8);
+    corner.Parent = sliderframe;
+    
+    local stroke = Instance.new("UIStroke");
+    stroke.Color = clrs.pink;
+    stroke.Thickness = 1;
+    stroke.Transparency = 0.8;
+    stroke.Parent = sliderframe;
     
     -- // main label
     local mainlbl = Instance.new("TextLabel");
     mainlbl.Size = UDim2.new(1, -60, 0, 20);
-    mainlbl.Position = UDim2.new(0, 0, 0, 5);
+    mainlbl.Position = UDim2.new(0, 10, 0, desc ~= "" and 18 or 12);
     mainlbl.BackgroundTransparency = 1;
     mainlbl.Text = text;
     mainlbl.TextColor3 = clrs.white;
@@ -269,7 +318,7 @@ function components:AddSlider(parent, cfg)
     -- // value label
     local vallbl = Instance.new("TextLabel");
     vallbl.Size = UDim2.new(0, 50, 0, 20);
-    vallbl.Position = UDim2.new(1, -50, 0, 5);
+    vallbl.Position = UDim2.new(1, -60, 0, desc ~= "" and 18 or 12);
     vallbl.BackgroundTransparency = 1;
     vallbl.Text = tostring(default);
     vallbl.TextColor3 = clrs.pink;
@@ -281,8 +330,8 @@ function components:AddSlider(parent, cfg)
     -- // description
     if desc ~= "" then
         local desclbl = Instance.new("TextLabel");
-        desclbl.Size = UDim2.new(1, 0, 0, 16);
-        desclbl.Position = UDim2.new(0, 0, 0, 25);
+        desclbl.Size = UDim2.new(1, -60, 0, 16);
+        desclbl.Position = UDim2.new(0, 10, 0, 38);
         desclbl.BackgroundTransparency = 1;
         desclbl.Text = desc;
         desclbl.TextColor3 = clrs.grey;
@@ -294,8 +343,8 @@ function components:AddSlider(parent, cfg)
     
     -- // slider track
     local track = Instance.new("Frame");
-    track.Size = UDim2.new(1, 0, 0, 6);
-    track.Position = UDim2.new(0, 0, 1, desc ~= "" and -20 or -15);
+    track.Size = UDim2.new(1, -20, 0, 6);
+    track.Position = UDim2.new(0, 10, 1, desc ~= "" and -25 or -20);
     track.BackgroundColor3 = clrs.darkgrey;
     track.BorderSizePixel = 0;
     track.Parent = sliderframe;
@@ -335,8 +384,8 @@ function components:AddSlider(parent, cfg)
     
     -- // slider button
     local sliderbtn = Instance.new("TextButton");
-    sliderbtn.Size = UDim2.new(1, 0, 0, 20);
-    sliderbtn.Position = UDim2.new(0, 0, 1, desc ~= "" and -25 or -20);
+    sliderbtn.Size = UDim2.new(1, -20, 0, 20);
+    sliderbtn.Position = UDim2.new(0, 10, 1, desc ~= "" and -30 or -25);
     sliderbtn.BackgroundTransparency = 1;
     sliderbtn.Text = "";
     sliderbtn.Parent = sliderframe;
@@ -404,7 +453,7 @@ function components:AddSlider(parent, cfg)
     };
 end;
 
--- // INPUT
+-- // INPUT with box
 function components:AddInput(parent, cfg)
     local cfg = cfg or {};
     local text = cfg.Text or "Input";
@@ -413,14 +462,26 @@ function components:AddInput(parent, cfg)
     local callback = cfg.Callback or function() end;
     
     local inputframe = Instance.new("Frame");
-    inputframe.Size = UDim2.new(1, 0, 0, desc ~= "" and 75 or 55);
-    inputframe.BackgroundTransparency = 1;
+    inputframe.Size = UDim2.new(1, 0, 0, desc ~= "" and 85 or 65);
+    inputframe.BackgroundColor3 = clrs.secondary;
+    inputframe.BackgroundTransparency = 0.1;
+    inputframe.BorderSizePixel = 0;
     inputframe.Parent = parent;
+    
+    local corner = Instance.new("UICorner");
+    corner.CornerRadius = UDim.new(0, 8);
+    corner.Parent = inputframe;
+    
+    local stroke = Instance.new("UIStroke");
+    stroke.Color = clrs.pink;
+    stroke.Thickness = 1;
+    stroke.Transparency = 0.8;
+    stroke.Parent = inputframe;
     
     -- // main label
     local mainlbl = Instance.new("TextLabel");
-    mainlbl.Size = UDim2.new(1, 0, 0, 20);
-    mainlbl.Position = UDim2.new(0, 0, 0, 5);
+    mainlbl.Size = UDim2.new(1, -20, 0, 20);
+    mainlbl.Position = UDim2.new(0, 10, 0, desc ~= "" and 18 or 12);
     mainlbl.BackgroundTransparency = 1;
     mainlbl.Text = text;
     mainlbl.TextColor3 = clrs.white;
@@ -432,8 +493,8 @@ function components:AddInput(parent, cfg)
     -- // description
     if desc ~= "" then
         local desclbl = Instance.new("TextLabel");
-        desclbl.Size = UDim2.new(1, 0, 0, 16);
-        desclbl.Position = UDim2.new(0, 0, 0, 25);
+        desclbl.Size = UDim2.new(1, -20, 0, 16);
+        desclbl.Position = UDim2.new(0, 10, 0, 38);
         desclbl.BackgroundTransparency = 1;
         desclbl.Text = desc;
         desclbl.TextColor3 = clrs.grey;
@@ -445,8 +506,8 @@ function components:AddInput(parent, cfg)
     
     -- // input box
     local inputbox = Instance.new("TextBox");
-    inputbox.Size = UDim2.new(1, 0, 0, 30);
-    inputbox.Position = UDim2.new(0, 0, 1, desc ~= "" and -35 or -30);
+    inputbox.Size = UDim2.new(1, -20, 0, 30);
+    inputbox.Position = UDim2.new(0, 10, 1, desc ~= "" and -40 or -35);
     inputbox.BackgroundColor3 = clrs.accent;
     inputbox.BorderSizePixel = 0;
     inputbox.Text = "";
@@ -494,20 +555,32 @@ function components:AddInput(parent, cfg)
     };
 end;
 
--- // LABEL
+-- // LABEL with box
 function components:AddLabel(parent, cfg)
     local cfg = cfg or {};
     local text = cfg.Text or "Label";
     local desc = cfg.Description or "";
     
     local labelframe = Instance.new("Frame");
-    labelframe.Size = UDim2.new(1, 0, 0, desc ~= "" and 45 or 25);
-    labelframe.BackgroundTransparency = 1;
+    labelframe.Size = UDim2.new(1, 0, 0, desc ~= "" and 55 or 35);
+    labelframe.BackgroundColor3 = clrs.secondary;
+    labelframe.BackgroundTransparency = 0.1;
+    labelframe.BorderSizePixel = 0;
     labelframe.Parent = parent;
     
+    local corner = Instance.new("UICorner");
+    corner.CornerRadius = UDim.new(0, 8);
+    corner.Parent = labelframe;
+    
+    local stroke = Instance.new("UIStroke");
+    stroke.Color = clrs.pink;
+    stroke.Thickness = 1;
+    stroke.Transparency = 0.8;
+    stroke.Parent = labelframe;
+    
     local mainlbl = Instance.new("TextLabel");
-    mainlbl.Size = UDim2.new(1, 0, 0, 20);
-    mainlbl.Position = UDim2.new(0, 0, 0, 5);
+    mainlbl.Size = UDim2.new(1, -20, 0, 20);
+    mainlbl.Position = UDim2.new(0, 10, 0, desc ~= "" and 8 or 7);
     mainlbl.BackgroundTransparency = 1;
     mainlbl.Text = text;
     mainlbl.TextColor3 = clrs.white;
@@ -518,8 +591,8 @@ function components:AddLabel(parent, cfg)
     
     if desc ~= "" then
         local desclbl = Instance.new("TextLabel");
-        desclbl.Size = UDim2.new(1, 0, 0, 16);
-        desclbl.Position = UDim2.new(0, 0, 0, 25);
+        desclbl.Size = UDim2.new(1, -20, 0, 16);
+        desclbl.Position = UDim2.new(0, 10, 0, 28);
         desclbl.BackgroundTransparency = 1;
         desclbl.Text = desc;
         desclbl.TextColor3 = clrs.grey;
@@ -542,7 +615,7 @@ end;
 -- // SEPARATOR
 function components:AddSeparator(parent)
     local sepframe = Instance.new("Frame");
-    sepframe.Size = UDim2.new(1, 0, 0, 15);
+    sepframe.Size = UDim2.new(1, 0, 0, 20);
     sepframe.BackgroundTransparency = 1;
     sepframe.Parent = parent;
     
