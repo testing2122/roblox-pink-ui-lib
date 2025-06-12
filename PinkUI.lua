@@ -72,51 +72,6 @@ function pnkui:CreateWindow(cfg)
     stroke.Transparency = 0.4;
     stroke.Parent = main;
     
-    -- // full height left gradient
-    local gradient = Instance.new("Frame");
-    gradient.Name = "LeftGradient";
-    gradient.Size = UDim2.new(0, 300, 1, 0);
-    gradient.Position = UDim2.new(0, 0, 0, 0);
-    gradient.BackgroundTransparency = 1;
-    gradient.Parent = main;
-    
-    local gradientimg = Instance.new("Frame");
-    gradientimg.Size = UDim2.new(1, 0, 1, 0);
-    gradientimg.BackgroundColor3 = clrs.pink;
-    gradientimg.BackgroundTransparency = 0.92;
-    gradientimg.BorderSizePixel = 0;
-    gradientimg.Parent = gradient;
-    
-    local gradcorner = Instance.new("UICorner");
-    gradcorner.CornerRadius = UDim.new(0, 16);
-    gradcorner.Parent = gradientimg;
-    
-    local gradmask = Instance.new("UIGradient");
-    gradmask.Transparency = NumberSequence.new{
-        NumberSequenceKeypoint.new(0, 0),
-        NumberSequenceKeypoint.new(0.6, 0.7),
-        NumberSequenceKeypoint.new(1, 1)
-    };
-    gradmask.Rotation = 0;
-    gradmask.Parent = gradientimg;
-    
-    -- // corner fix for gradient
-    local gradfix = Instance.new("Frame");
-    gradfix.Size = UDim2.new(0, 16, 1, 0);
-    gradfix.Position = UDim2.new(1, -16, 0, 0);
-    gradfix.BackgroundColor3 = clrs.pink;
-    gradfix.BackgroundTransparency = 0.92;
-    gradfix.BorderSizePixel = 0;
-    gradfix.Parent = gradientimg;
-    
-    local gradfix2 = Instance.new("UIGradient");
-    gradfix2.Transparency = NumberSequence.new{
-        NumberSequenceKeypoint.new(0, 0.7),
-        NumberSequenceKeypoint.new(1, 1)
-    };
-    gradfix2.Rotation = 0;
-    gradfix2.Parent = gradfix;
-    
     -- // title bar
     local titlebar = Instance.new("Frame");
     titlebar.Name = "TitleBar";
@@ -188,23 +143,14 @@ function pnkui:CreateWindow(cfg)
     closecorner.CornerRadius = UDim.new(0, 8);
     closecorner.Parent = closebtn;
     
-    -- // top separator line
+    -- // top separator line (grey instead of red)
     local topsep = Instance.new("Frame");
     topsep.Name = "TopSeparator";
-    topsep.Size = UDim2.new(1, -50, 0, 2);
+    topsep.Size = UDim2.new(1, -50, 0, 1);
     topsep.Position = UDim2.new(0, 25, 0, 68);
-    topsep.BackgroundColor3 = clrs.red;
+    topsep.BackgroundColor3 = clrs.separator;
     topsep.BorderSizePixel = 0;
     topsep.Parent = main;
-    
-    local topsepgrad = Instance.new("UIGradient");
-    topsepgrad.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, clrs.red),
-        ColorSequenceKeypoint.new(0.5, clrs.pink),
-        ColorSequenceKeypoint.new(1, clrs.red)
-    };
-    topsepgrad.Rotation = 0;
-    topsepgrad.Parent = topsep;
     
     local topsepcorner = Instance.new("UICorner");
     topsepcorner.CornerRadius = UDim.new(0, 1);
@@ -433,10 +379,10 @@ function pnkui:CreateWindow(cfg)
                 tab.content.Visible = false;
             end;
             
-            -- // select this tab
-            createtween(tablbl, twinfo.med, {TextColor3 = clrs.white}):Play();
+            -- // select this tab (only pink, no white)
+            createtween(tablbl, twinfo.med, {TextColor3 = clrs.pink}):Play();
             if iconlbl then
-                createtween(iconlbl, twinfo.med, {TextColor3 = clrs.lightpink}):Play();
+                createtween(iconlbl, twinfo.med, {TextColor3 = clrs.pink}):Play();
             end;
             createtween(underline, twinfo.med, {Size = UDim2.new(0, textbounds.X, 0, 3)}):Play();
             
@@ -536,10 +482,34 @@ function pnkui:CreateWindow(cfg)
             sectionlayout.Parent = sectioncontent;
             
             local sectionpad = Instance.new("UIPadding");
-            sectionpad.PaddingAll = UDim.new(0, 5);
+            sectionpad.PaddingLeft = UDim.new(0, 5);
+            sectionpad.PaddingRight = UDim.new(0, 5);
+            sectionpad.PaddingTop = UDim.new(0, 5);
+            sectionpad.PaddingBottom = UDim.new(0, 5);
             sectionpad.Parent = sectioncontent;
             
             return sectioncontent;
+        end;
+        
+        -- // add separator method
+        function tabmethods:AddSeparator()
+            local sepframe = Instance.new("Frame");
+            sepframe.Size = UDim2.new(1, 0, 0, 15);
+            sepframe.BackgroundTransparency = 1;
+            sepframe.Parent = tabcontent;
+            
+            local sep = Instance.new("Frame");
+            sep.Size = UDim2.new(1, -20, 0, 1);
+            sep.Position = UDim2.new(0, 10, 0.5, -1);
+            sep.BackgroundColor3 = clrs.separator;
+            sep.BorderSizePixel = 0;
+            sep.Parent = sepframe;
+            
+            local sepcorner = Instance.new("UICorner");
+            sepcorner.CornerRadius = UDim.new(0, 1);
+            sepcorner.Parent = sep;
+            
+            return sepframe;
         end;
         
         return tabmethods;
