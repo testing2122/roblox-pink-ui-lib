@@ -643,30 +643,30 @@ function components:AddDropdown(parent, cfg)
     arrow.Font = Enum.Font.Gotham;
     arrow.Parent = dropbtn;
     
-    -- // Find the main UI container for proper positioning
-    local function findMainContainer()
+    -- // Find the ScreenGui for proper dropdown positioning
+    local function findScreenGui()
         local current = parent;
         while current and current.Parent do
-            if current.Name == "PinkUI" or current:FindFirstChild("Main") then
+            if current:IsA("ScreenGui") then
                 return current;
             end;
             current = current.Parent;
         end;
-        return game:GetService("CoreGui");
+        return game:GetService("CoreGui"):FindFirstChild("PinkUI") or game:GetService("CoreGui");
     end;
     
-    local mainContainer = findMainContainer();
+    local screenGui = findScreenGui();
     
-    -- // WORKING dropdown list - positioned below button
+    -- // FIXED dropdown list - properly positioned and parented
     local droplist = Instance.new("Frame");
     droplist.Size = UDim2.new(0, 0, 0, 0);
-    droplist.Position = UDim2.new(0, 0, 1, 5); -- 5 pixels below the button
+    droplist.Position = UDim2.new(0, 0, 0, 0);
     droplist.BackgroundColor3 = clrs.secondary;
     droplist.BorderSizePixel = 0;
     droplist.Visible = false;
     droplist.ZIndex = 1000;
     droplist.ClipsDescendants = true;
-    droplist.Parent = mainContainer;
+    droplist.Parent = screenGui;
     
     registerElement(droplist, "secondaries");
     
@@ -703,7 +703,7 @@ function components:AddDropdown(parent, cfg)
     local isopen = false;
     local maxHeight = math.min(#options * 30, 150);
     
-    -- // Position dropdown relative to button
+    -- // FIXED position dropdown relative to button
     local function positionDropdown()
         local btnPos = dropbtn.AbsolutePosition;
         local btnSize = dropbtn.AbsoluteSize;
@@ -713,71 +713,92 @@ function components:AddDropdown(parent, cfg)
         local xPos = btnPos.X;
         local yPos = btnPos.Y + btnSize.Y + 5;
         
-        -- Check if dropdown would go off screen
+        -- Check if dropdown would go off screen vertically
         if yPos + maxHeight > screenSize.Y then
             yPos = btnPos.Y - maxHeight - 5; -- Position above
         end;
         
+        -- Check if dropdown would go off screen horizontally
         if xPos + btnSize.X > screenSize.X then
             xPos = screenSize.X - btnSize.X;
         end;
         
-        -- Set position and size
+        -- Ensure dropdown doesn't go off left edge
+        if xPos < 0 then
+            xPos = 0;
+        end;
+        
+        -- Set position and initial size
         droplist.Position = UDim2.new(0, xPos, 0, yPos);
-        droplist.Size = UDim2.new(0, btnSize.X, 0, 0); -- Start with 0 height
+        droplist.Size = UDim2.new(0, btnSize.X, 0, 0); -- Start with 0 height for animation
     end;
     
     -- // create option buttons
-    for i, option in ipairs(options) do
-        local optionbtn = Instance.new("TextButton");
-        optionbtn.Size = UDim2.new(1, 0, 0, 30);
-        optionbtn.BackgroundColor3 = option == selected and clrs.pink or Color3.new(0, 0, 0);
-        optionbtn.BackgroundTransparency = option == selected and 0.7 or 1;
-        optionbtn.BorderSizePixel = 0;
-        optionbtn.Text = option;
-        optionbtn.TextColor3 = option == selected and clrs.pink or clrs.white;
-        optionbtn.TextSize = 13;
-        optionbtn.Font = Enum.Font.Gotham;
-        optionbtn.LayoutOrder = i;
-        optionbtn.Parent = scrollframe;
-        
-        optionbtn.MouseEnter:Connect(function()
-            if option ~= selected then
-                createtween(optionbtn, twinfo.fast, {BackgroundTransparency = 0.9, TextColor3 = clrs.lightpink}):Play();
+    local function createOptions()
+        -- Clear existing options
+        for _, child in ipairs(scrollframe:GetChildren()) do
+            if child:IsA("TextButton") then
+                child:Destroy();
             end;
-        end);
+        end;
         
-        optionbtn.MouseLeave:Connect(function()
-            if option ~= selected then
-                createtween(optionbtn, twinfo.fast, {BackgroundTransparency = 1, TextColor3 = clrs.white}):Play();
-            end;
-        end);
-        
-        optionbtn.MouseButton1Click:Connect(function()
-            -- // update selection
-            for _, btn in ipairs(scrollframe:GetChildren()) do
-                if btn:IsA("TextButton") then
-                    if btn.Text == option then
-                        createtween(btn, twinfo.fast, {BackgroundTransparency = 0.7, TextColor3 = clrs.pink}):Play();
-                    else
-                        createtween(btn, twinfo.fast, {BackgroundTransparency = 1, TextColor3 = clrs.white}):Play();
+        for i, option in ipairs(options) do
+            local optionbtn = Instance.new("TextButton");
+            optionbtn.Size = UDim2.new(1, 0, 0, 30);
+            optionbtn.BackgroundColor3 = option == selected and clrs.pink or Color3.new(0, 0, 0);
+            optionbtn.BackgroundTransparency = option == selected and 0.7 or 1;
+            optionbtn.BorderSizePixel = 0;
+            optionbtn.Text = option;
+            optionbtn.TextColor3 = option == selected and clrs.pink or clrs.white;
+            optionbtn.TextSize = 13;
+            optionbtn.Font = Enum.Font.Gotham;
+            optionbtn.LayoutOrder = i;
+            optionbtn.Parent = scrollframe;
+            
+            optionbtn.MouseEnter:Connect(function()
+                if option ~= selected then
+                    createtween(optionbtn, twinfo.fast, {BackgroundTransparency = 0.9, TextColor3 = clrs.lightpink}):Play();
+                end;
+            end);
+            
+            optionbtn.MouseLeave:Connect(function()
+                if option ~= selected then
+                    createtween(optionbtn, twinfo.fast, {BackgroundTransparency = 1, TextColor3 = clrs.white}):Play();
+                end;
+            end);
+            
+            optionbtn.MouseButton1Click:Connect(function()
+                -- Update selection
+                for _, btn in ipairs(scrollframe:GetChildren()) do
+                    if btn:IsA("TextButton") then
+                        if btn.Text == option then
+                            createtween(btn, twinfo.fast, {BackgroundTransparency = 0.7, TextColor3 = clrs.pink}):Play();
+                        else
+                            createtween(btn, twinfo.fast, {BackgroundTransparency = 1, TextColor3 = clrs.white}):Play();
+                        end;
                     end;
                 end;
-            end;
-            
-            selected = option;
-            selectedlbl.Text = option;
-            
-            -- // close dropdown
-            isopen = false;
-            createtween(droplist, twinfo.fast, {Size = UDim2.new(0, droplist.Size.X.Offset, 0, 0)}):Play();
-            createtween(arrow, twinfo.fast, {Rotation = 0}):Play();
-            wait(0.25);
-            droplist.Visible = false;
-            
-            callback(option);
-        end);
+                
+                selected = option;
+                selectedlbl.Text = option;
+                
+                -- Close dropdown
+                isopen = false;
+                createtween(droplist, twinfo.fast, {Size = UDim2.new(0, droplist.Size.X.Offset, 0, 0)}):Play();
+                createtween(arrow, twinfo.fast, {Rotation = 0}):Play();
+                
+                spawn(function()
+                    wait(0.25);
+                    droplist.Visible = false;
+                end);
+                
+                callback(option);
+            end);
+        end;
     end;
+    
+    -- Initialize options
+    createOptions();
     
     dropbtn.MouseButton1Click:Connect(function()
         isopen = not isopen;
@@ -790,8 +811,11 @@ function components:AddDropdown(parent, cfg)
         else
             createtween(droplist, twinfo.fast, {Size = UDim2.new(0, droplist.Size.X.Offset, 0, 0)}):Play();
             createtween(arrow, twinfo.fast, {Rotation = 0}):Play();
-            wait(0.25);
-            droplist.Visible = false;
+            
+            spawn(function()
+                wait(0.25);
+                droplist.Visible = false;
+            end);
         end;
     end);
     
@@ -813,8 +837,11 @@ function components:AddDropdown(parent, cfg)
                 isopen = false;
                 createtween(droplist, twinfo.fast, {Size = UDim2.new(0, droplist.Size.X.Offset, 0, 0)}):Play();
                 createtween(arrow, twinfo.fast, {Rotation = 0}):Play();
-                wait(0.25);
-                droplist.Visible = false;
+                
+                spawn(function()
+                    wait(0.25);
+                    droplist.Visible = false;
+                end);
             end;
         end;
     end);
@@ -847,62 +874,7 @@ function components:AddDropdown(parent, cfg)
         SetOptions = function(newoptions)
             options = newoptions;
             maxHeight = math.min(#options * 30, 150);
-            
-            for _, child in ipairs(scrollframe:GetChildren()) do
-                if child:IsA("TextButton") then
-                    child:Destroy();
-                end;
-            end;
-            
-            for i, option in ipairs(options) do
-                local optionbtn = Instance.new("TextButton");
-                optionbtn.Size = UDim2.new(1, 0, 0, 30);
-                optionbtn.BackgroundColor3 = option == selected and clrs.pink or Color3.new(0, 0, 0);
-                optionbtn.BackgroundTransparency = option == selected and 0.7 or 1;
-                optionbtn.BorderSizePixel = 0;
-                optionbtn.Text = option;
-                optionbtn.TextColor3 = option == selected and clrs.pink or clrs.white;
-                optionbtn.TextSize = 13;
-                optionbtn.Font = Enum.Font.Gotham;
-                optionbtn.LayoutOrder = i;
-                optionbtn.Parent = scrollframe;
-                
-                optionbtn.MouseEnter:Connect(function()
-                    if option ~= selected then
-                        createtween(optionbtn, twinfo.fast, {BackgroundTransparency = 0.9, TextColor3 = clrs.lightpink}):Play();
-                    end;
-                end);
-                
-                optionbtn.MouseLeave:Connect(function()
-                    if option ~= selected then
-                        createtween(optionbtn, twinfo.fast, {BackgroundTransparency = 1, TextColor3 = clrs.white}):Play();
-                    end;
-                end);
-                
-                optionbtn.MouseButton1Click:Connect(function()
-                    for _, btn in ipairs(scrollframe:GetChildren()) do
-                        if btn:IsA("TextButton") then
-                            if btn.Text == option then
-                                createtween(btn, twinfo.fast, {BackgroundTransparency = 0.7, TextColor3 = clrs.pink}):Play();
-                            else
-                                createtween(btn, twinfo.fast, {BackgroundTransparency = 1, TextColor3 = clrs.white}):Play();
-                            end;
-                        end;
-                    end;
-                    
-                    selected = option;
-                    selectedlbl.Text = option;
-                    
-                    isopen = false;
-                    createtween(droplist, twinfo.fast, {Size = UDim2.new(0, droplist.Size.X.Offset, 0, 0)}):Play();
-                    createtween(arrow, twinfo.fast, {Rotation = 0}):Play();
-                    wait(0.25);
-                    droplist.Visible = false;
-                    
-                    callback(option);
-                end);
-            end;
-            
+            createOptions();
             scrollframe.CanvasSize = UDim2.new(0, 0, 0, #options * 30);
         end
     };
