@@ -18,14 +18,18 @@ local clrs = {
     toggleoff = Color3.fromRGB(80, 80, 85)
 };
 
--- // store all UI elements for theme updates
+-- // store all UI elements for theme updates with their states
 local uiElements = {
+    toggles = {}, -- {element, label, button, circle, enabled}
+    buttons = {},
+    sliders = {}, -- {fill, handle, valueLabel}
+    inputs = {},
+    texts = {}, -- {element, colorType}
     backgrounds = {},
     accents = {},
     pinks = {},
     secondaries = {},
     separators = {},
-    texts = {},
     strokes = {},
     scrollbars = {}
 };
@@ -37,8 +41,31 @@ function components:ApplyTheme(newTheme)
         clrs[key] = value;
     end;
     
-    -- Update all existing UI elements with smooth transitions
     local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out);
+    
+    -- Update toggles with proper state handling
+    for _, toggleData in pairs(uiElements.toggles) do
+        if toggleData.button and toggleData.button.Parent then
+            local enabled = toggleData.enabled;
+            if enabled then
+                tweenserv:Create(toggleData.button, tweenInfo, {BackgroundColor3 = clrs.pink}):Play();
+                tweenserv:Create(toggleData.label, tweenInfo, {TextColor3 = clrs.white}):Play();
+            else
+                tweenserv:Create(toggleData.button, tweenInfo, {BackgroundColor3 = clrs.accent}):Play();
+                tweenserv:Create(toggleData.label, tweenInfo, {TextColor3 = clrs.toggleoff}):Play();
+            end;
+        end;
+    end;
+    
+    -- Update sliders
+    for _, sliderData in pairs(uiElements.sliders) do
+        if sliderData.fill and sliderData.fill.Parent then
+            tweenserv:Create(sliderData.fill, tweenInfo, {BackgroundColor3 = clrs.pink}):Play();
+        end;
+        if sliderData.valueLabel and sliderData.valueLabel.Parent then
+            tweenserv:Create(sliderData.valueLabel, tweenInfo, {TextColor3 = clrs.pink}):Play();
+        end;
+    end;
     
     -- Update backgrounds
     for _, element in pairs(uiElements.backgrounds) do
@@ -75,10 +102,21 @@ function components:ApplyTheme(newTheme)
         end;
     end;
     
-    -- Update text colors
+    -- Update text colors with proper type handling
     for _, data in pairs(uiElements.texts) do
         if data.element and data.element.Parent then
-            local newColor = clrs[data.colorType] or clrs.white;
+            local newColor;
+            if data.colorType == "white" then
+                newColor = clrs.white;
+            elseif data.colorType == "grey" then
+                newColor = clrs.grey;
+            elseif data.colorType == "pink" then
+                newColor = clrs.pink;
+            elseif data.colorType == "toggleoff" then
+                newColor = clrs.toggleoff;
+            else
+                newColor = clrs.white;
+            end;
             tweenserv:Create(data.element, tweenInfo, {TextColor3 = newColor}):Play();
         end;
     end;
@@ -94,156 +132,6 @@ function components:ApplyTheme(newTheme)
     for _, element in pairs(uiElements.scrollbars) do
         if element and element.Parent then
             tweenserv:Create(element, tweenInfo, {ScrollBarImageColor3 = clrs.pink}):Play();
-        end;
-    end;
-    
-    -- COMPREHENSIVE main UI update
-    local screenGui = game:GetService("CoreGui"):FindFirstChild("PinkUI");
-    if screenGui then
-        local main = screenGui:FindFirstChild("Main");
-        if main then
-            -- Update main window colors
-            tweenserv:Create(main, tweenInfo, {BackgroundColor3 = clrs.bg}):Play();
-            
-            -- Update title and subtitle
-            local titlebar = main:FindFirstChild("TitleBar");
-            if titlebar then
-                local title = titlebar:FindFirstChild("Title");
-                local subtitle = titlebar:FindFirstChild("Subtitle");
-                
-                -- Update title gradient
-                if title and title:FindFirstChild("UIGradient") then
-                    local gradient = title:FindFirstChild("UIGradient");
-                    gradient.Color = ColorSequence.new{
-                        ColorSequenceKeypoint.new(0, clrs.pink),
-                        ColorSequenceKeypoint.new(0.5, clrs.lightpink),
-                        ColorSequenceKeypoint.new(1, clrs.pink)
-                    };
-                end;
-                
-                -- Update subtitle color
-                if subtitle then
-                    tweenserv:Create(subtitle, tweenInfo, {TextColor3 = clrs.grey}):Play();
-                end;
-            end;
-            
-            -- Update tab container and tabs
-            local tabsContainer = main:FindFirstChild("Tabs");
-            if tabsContainer then
-                -- Update tab container background
-                tweenserv:Create(tabsContainer, tweenInfo, {BackgroundColor3 = clrs.secondary}):Play();
-                
-                -- Update all tab buttons and text
-                for _, tab in pairs(tabsContainer:GetChildren()) do
-                    if tab:IsA("TextButton") and tab.Name ~= "TabLine" then
-                        -- Update tab background
-                        tweenserv:Create(tab, tweenInfo, {BackgroundColor3 = clrs.accent}):Play();
-                        
-                        -- Check if this is the active tab
-                        local isActive = tab.BackgroundTransparency < 0.5;
-                        if isActive then
-                            tweenserv:Create(tab, tweenInfo, {BackgroundColor3 = clrs.secondary, TextColor3 = clrs.pink}):Play();
-                        else
-                            tweenserv:Create(tab, tweenInfo, {TextColor3 = clrs.grey}):Play();
-                        end;
-                        
-                        -- Update tab icon if it exists
-                        local icon = tab:FindFirstChild("Icon");
-                        if icon then
-                            tweenserv:Create(icon, tweenInfo, {TextColor3 = isActive and clrs.pink or clrs.grey}):Play();
-                        end;
-                    end;
-                end;
-                
-                -- Update tab underline
-                local tabLine = tabsContainer:FindFirstChild("TabLine");
-                if tabLine then
-                    tweenserv:Create(tabLine, tweenInfo, {BackgroundColor3 = clrs.pink}):Play();
-                end;
-            end;
-            
-            -- Update content area
-            local contentArea = main:FindFirstChild("Content");
-            if contentArea then
-                tweenserv:Create(contentArea, tweenInfo, {BackgroundColor3 = clrs.bg}):Play();
-                
-                -- Update all tab content
-                for _, tabContent in pairs(contentArea:GetChildren()) do
-                    if tabContent:IsA("Frame") and tabContent.Name:find("Tab") then
-                        tweenserv:Create(tabContent, tweenInfo, {BackgroundColor3 = clrs.bg}):Play();
-                        
-                        -- Update all boxes in this tab
-                        for _, box in pairs(tabContent:GetChildren()) do
-                            if box:IsA("Frame") and box.Name:find("Box") then
-                                -- Update box background
-                                tweenserv:Create(box, tweenInfo, {BackgroundColor3 = clrs.secondary}):Play();
-                                
-                                -- Update box title if it exists
-                                local titleLabel = box:FindFirstChild("Title");
-                                if titleLabel then
-                                    tweenserv:Create(titleLabel, tweenInfo, {TextColor3 = clrs.white}):Play();
-                                end;
-                                
-                                -- Update box content area
-                                local content = box:FindFirstChild("Content");
-                                if content then
-                                    tweenserv:Create(content, tweenInfo, {BackgroundColor3 = clrs.secondary}):Play();
-                                end;
-                            end;
-                        end;
-                    end;
-                end;
-            end;
-            
-            -- Update ALL text elements in the UI comprehensively
-            for _, descendant in pairs(main:GetDescendants()) do
-                if descendant:IsA("TextLabel") then
-                    -- Determine text color based on context
-                    local name = descendant.Name:lower();
-                    local parent = descendant.Parent;
-                    
-                    if name:find("title") or (parent and parent.Name:find("TitleBar")) then
-                        -- Title elements stay white or use gradient
-                        if not descendant:FindFirstChild("UIGradient") then
-                            tweenserv:Create(descendant, tweenInfo, {TextColor3 = clrs.white}):Play();
-                        end;
-                    elseif name:find("subtitle") or name:find("description") or name:find("desc") then
-                        -- Subtitles and descriptions use grey
-                        tweenserv:Create(descendant, tweenInfo, {TextColor3 = clrs.grey}):Play();
-                    elseif name:find("value") or name:find("val") then
-                        -- Value displays use pink
-                        tweenserv:Create(descendant, tweenInfo, {TextColor3 = clrs.pink}):Play();
-                    else
-                        -- Default text uses white
-                        tweenserv:Create(descendant, tweenInfo, {TextColor3 = clrs.white}):Play();
-                    end;
-                elseif descendant:IsA("TextButton") then
-                    -- Update button text and backgrounds
-                    local name = descendant.Name:lower();
-                    if name:find("tab") then
-                        -- Tab buttons handled above
-                        continue;
-                    else
-                        -- Regular buttons
-                        tweenserv:Create(descendant, tweenInfo, {BackgroundColor3 = clrs.accent, TextColor3 = clrs.white}):Play();
-                    end;
-                elseif descendant:IsA("TextBox") then
-                    -- Update input boxes
-                    tweenserv:Create(descendant, tweenInfo, {BackgroundColor3 = clrs.accent, TextColor3 = clrs.white}):Play();
-                elseif descendant:IsA("Frame") then
-                    -- Update frame backgrounds based on context
-                    local name = descendant.Name:lower();
-                    if name:find("separator") then
-                        tweenserv:Create(descendant, tweenInfo, {BackgroundColor3 = clrs.separator}):Play();
-                    elseif name:find("box") or name:find("container") then
-                        tweenserv:Create(descendant, tweenInfo, {BackgroundColor3 = clrs.secondary}):Play();
-                    end;
-                elseif descendant:IsA("UIStroke") then
-                    tweenserv:Create(descendant, tweenInfo, {Color = clrs.separator}):Play();
-                elseif descendant:IsA("ScrollingFrame") then
-                    tweenserv:Create(descendant, tweenInfo, {ScrollBarImageColor3 = clrs.pink, BackgroundColor3 = clrs.secondary}):Play();
-                end;
-            end;
         end;
     end;
     
@@ -378,8 +266,18 @@ function components:AddToggle(parent, cfg)
     
     local enabled = default;
     
+    -- Register toggle for theme updates
+    local toggleData = {
+        button = togglebtn,
+        label = togglelbl,
+        circle = togglecircle,
+        enabled = enabled
+    };
+    table.insert(uiElements.toggles, toggleData);
+    
     togglebtn.MouseButton1Click:Connect(function()
         enabled = not enabled;
+        toggleData.enabled = enabled; -- Update stored state
         
         if enabled then
             createtween(togglebtn, twinfo.med, {BackgroundColor3 = clrs.pink}):Play();
@@ -402,6 +300,7 @@ function components:AddToggle(parent, cfg)
     return {
         SetValue = function(value)
             enabled = value;
+            toggleData.enabled = enabled; -- Update stored state
             if enabled then
                 createtween(togglebtn, twinfo.med, {BackgroundColor3 = clrs.pink}):Play();
                 createtween(togglecircle, twinfo.med, {Position = UDim2.new(1, -20, 0.5, -9)}):Play();
@@ -615,6 +514,14 @@ function components:AddSlider(parent, cfg)
     handlecorner.CornerRadius = UDim.new(0, 8);
     handlecorner.Parent = sliderhandle;
     
+    -- Register slider for theme updates
+    local sliderData = {
+        fill = sliderfill,
+        handle = sliderhandle,
+        valueLabel = valuelbl
+    };
+    table.insert(uiElements.sliders, sliderData);
+    
     local value = default;
     local dragging = false;
     
@@ -764,6 +671,303 @@ function components:AddInput(parent, cfg)
         end,
         GetValue = function()
             return inputbox.Text;
+        end
+    };
+end;
+
+function components:AddDropdown(parent, cfg)
+    local cfg = cfg or {};
+    local name = cfg.Name or "Dropdown";
+    local desc = cfg.Description or "";
+    local options = cfg.Options or {"Option 1", "Option 2", "Option 3"};
+    local default = cfg.Default or options[1];
+    local callback = cfg.Callback or function() end;
+    local separator = cfg.Separator;
+    
+    local dropframe = Instance.new("Frame");
+    dropframe.Name = name;
+    dropframe.Size = UDim2.new(1, 0, 0, desc ~= "" and 75 or 55);
+    dropframe.BackgroundTransparency = 1;
+    dropframe.BorderSizePixel = 0;
+    dropframe.LayoutOrder = #parent:GetChildren();
+    dropframe.Parent = parent;
+    
+    -- // dropdown label
+    local droplbl = Instance.new("TextLabel");
+    droplbl.Size = UDim2.new(1, 0, 0, 20);
+    droplbl.Position = UDim2.new(0, 0, 0, 5);
+    droplbl.BackgroundTransparency = 1;
+    droplbl.Text = name;
+    droplbl.TextColor3 = clrs.white;
+    droplbl.TextSize = 14;
+    droplbl.Font = Enum.Font.GothamMedium;
+    droplbl.TextXAlignment = Enum.TextXAlignment.Left;
+    droplbl.Parent = dropframe;
+    
+    registerElement(droplbl, "texts", "white");
+    
+    -- // description
+    if desc ~= "" then
+        local desclbl = Instance.new("TextLabel");
+        desclbl.Size = UDim2.new(1, 0, 0, 15);
+        desclbl.Position = UDim2.new(0, 0, 0, 25);
+        desclbl.BackgroundTransparency = 1;
+        desclbl.Text = desc;
+        desclbl.TextColor3 = clrs.grey;
+        desclbl.TextSize = 12;
+        desclbl.Font = Enum.Font.Gotham;
+        desclbl.TextXAlignment = Enum.TextXAlignment.Left;
+        desclbl.Parent = dropframe;
+        
+        registerElement(desclbl, "texts", "grey");
+    end;
+    
+    -- // dropdown button
+    local dropbtn = Instance.new("TextButton");
+    dropbtn.Size = UDim2.new(1, 0, 0, 30);
+    dropbtn.Position = UDim2.new(0, 0, 1, desc ~= "" and -35 or -30);
+    dropbtn.BackgroundColor3 = clrs.accent;
+    dropbtn.BorderSizePixel = 0;
+    dropbtn.Text = default;
+    dropbtn.TextColor3 = clrs.white;
+    dropbtn.TextSize = 13;
+    dropbtn.Font = Enum.Font.Gotham;
+    dropbtn.TextXAlignment = Enum.TextXAlignment.Left;
+    dropbtn.Parent = dropframe;
+    
+    registerElement(dropbtn, "accents");
+    registerElement(dropbtn, "texts", "white");
+    
+    local dropcorner = Instance.new("UICorner");
+    dropcorner.CornerRadius = UDim.new(0, 6);
+    dropcorner.Parent = dropbtn;
+    
+    local droppad = Instance.new("UIPadding");
+    droppad.PaddingLeft = UDim.new(0, 12);
+    droppad.PaddingRight = UDim.new(0, 30);
+    droppad.Parent = dropbtn;
+    
+    -- // dropdown arrow
+    local droparrow = Instance.new("TextLabel");
+    droparrow.Size = UDim2.new(0, 20, 1, 0);
+    droparrow.Position = UDim2.new(1, -25, 0, 0);
+    droparrow.BackgroundTransparency = 1;
+    droparrow.Text = "▼";
+    droparrow.TextColor3 = clrs.grey;
+    droparrow.TextSize = 10;
+    droparrow.Font = Enum.Font.Gotham;
+    droparrow.Parent = dropbtn;
+    
+    registerElement(droparrow, "texts", "grey");
+    
+    -- // dropdown list
+    local droplist = Instance.new("ScrollingFrame");
+    droplist.Size = UDim2.new(1, 0, 0, math.min(#options * 30, 120));
+    droplist.Position = UDim2.new(0, 0, 1, 5);
+    droplist.BackgroundColor3 = clrs.secondary;
+    droplist.BorderSizePixel = 0;
+    droplist.ScrollBarThickness = 2;
+    droplist.ScrollBarImageColor3 = clrs.pink;
+    droplist.ScrollBarImageTransparency = 0.8;
+    droplist.CanvasSize = UDim2.new(0, 0, 0, #options * 30);
+    droplist.Visible = false;
+    droplist.Parent = dropbtn;
+    
+    registerElement(droplist, "secondaries");
+    registerElement(droplist, "scrollbars");
+    
+    local listcorner = Instance.new("UICorner");
+    listcorner.CornerRadius = UDim.new(0, 6);
+    listcorner.Parent = droplist;
+    
+    local listlayout = Instance.new("UIListLayout");
+    listlayout.SortOrder = Enum.SortOrder.LayoutOrder;
+    listlayout.Parent = droplist;
+    
+    local selected = default;
+    local isopen = false;
+    
+    -- // create option buttons
+    for i, option in ipairs(options) do
+        local optionbtn = Instance.new("TextButton");
+        optionbtn.Size = UDim2.new(1, 0, 0, 30);
+        optionbtn.BackgroundColor3 = option == selected and clrs.accent or Color3.new(0, 0, 0);
+        optionbtn.BackgroundTransparency = option == selected and 0 or 1;
+        optionbtn.BorderSizePixel = 0;
+        optionbtn.Text = option;
+        optionbtn.TextColor3 = clrs.white;
+        optionbtn.TextSize = 12;
+        optionbtn.Font = Enum.Font.Gotham;
+        optionbtn.TextXAlignment = Enum.TextXAlignment.Left;
+        optionbtn.LayoutOrder = i;
+        optionbtn.Parent = droplist;
+        
+        registerElement(optionbtn, "texts", "white");
+        
+        local optionpad = Instance.new("UIPadding");
+        optionpad.PaddingLeft = UDim.new(0, 12);
+        optionpad.Parent = optionbtn;
+        
+        optionbtn.MouseEnter:Connect(function()
+            if option ~= selected then
+                createtween(optionbtn, twinfo.fast, {BackgroundColor3 = clrs.accent, BackgroundTransparency = 0.5}):Play();
+            end;
+        end);
+        
+        optionbtn.MouseLeave:Connect(function()
+            if option ~= selected then
+                createtween(optionbtn, twinfo.fast, {BackgroundTransparency = 1}):Play();
+            end;
+        end);
+        
+        optionbtn.MouseButton1Click:Connect(function()
+            selected = option;
+            dropbtn.Text = option;
+            
+            -- Update selection visuals
+            for _, child in pairs(droplist:GetChildren()) do
+                if child:IsA("TextButton") then
+                    if child.Text == selected then
+                        createtween(child, twinfo.fast, {BackgroundColor3 = clrs.accent, BackgroundTransparency = 0}):Play();
+                    else
+                        createtween(child, twinfo.fast, {BackgroundTransparency = 1}):Play();
+                    end;
+                end;
+            end;
+            
+            -- Close dropdown
+            isopen = false;
+            createtween(droplist, twinfo.fast, {Size = UDim2.new(1, 0, 0, 0)}):Play();
+            createtween(droparrow, twinfo.fast, {Rotation = 0}):Play();
+            wait(0.25);
+            droplist.Visible = false;
+            
+            callback(selected);
+        end);
+    end;
+    
+    -- // dropdown toggle
+    dropbtn.MouseButton1Click:Connect(function()
+        isopen = not isopen;
+        if isopen then
+            droplist.Visible = true;
+            createtween(droplist, twinfo.fast, {Size = UDim2.new(1, 0, 0, math.min(#options * 30, 120))}):Play();
+            createtween(droparrow, twinfo.fast, {Rotation = 180}):Play();
+        else
+            createtween(droplist, twinfo.fast, {Size = UDim2.new(1, 0, 0, 0)}):Play();
+            createtween(droparrow, twinfo.fast, {Rotation = 0}):Play();
+            wait(0.25);
+            droplist.Visible = false;
+        end;
+    end);
+    
+    -- // add separator if requested
+    if separator then
+        self:AddSeparator(parent, separator == true and {} or separator);
+    end;
+    
+    return {
+        SetValue = function(value)
+            if table.find(options, value) then
+                selected = value;
+                dropbtn.Text = value;
+                
+                -- Update selection visuals
+                for _, child in pairs(droplist:GetChildren()) do
+                    if child:IsA("TextButton") then
+                        if child.Text == selected then
+                            createtween(child, twinfo.fast, {BackgroundColor3 = clrs.accent, BackgroundTransparency = 0}):Play();
+                        else
+                            createtween(child, twinfo.fast, {BackgroundTransparency = 1}):Play();
+                        end;
+                    end;
+                end;
+            end;
+        end,
+        GetValue = function()
+            return selected;
+        end,
+        SetOptions = function(newoptions)
+            options = newoptions;
+            
+            -- Clear existing options
+            for _, child in pairs(droplist:GetChildren()) do
+                if child:IsA("TextButton") then
+                    child:Destroy();
+                end;
+            end;
+            
+            -- Create new options
+            for i, option in ipairs(options) do
+                local optionbtn = Instance.new("TextButton");
+                optionbtn.Size = UDim2.new(1, 0, 0, 30);
+                optionbtn.BackgroundColor3 = option == selected and clrs.accent or Color3.new(0, 0, 0);
+                optionbtn.BackgroundTransparency = option == selected and 0 or 1;
+                optionbtn.BorderSizePixel = 0;
+                optionbtn.Text = option;
+                optionbtn.TextColor3 = clrs.white;
+                optionbtn.TextSize = 12;
+                optionbtn.Font = Enum.Font.Gotham;
+                optionbtn.TextXAlignment = Enum.TextXAlignment.Left;
+                optionbtn.LayoutOrder = i;
+                optionbtn.Parent = droplist;
+                
+                local optionpad = Instance.new("UIPadding");
+                optionpad.PaddingLeft = UDim.new(0, 12);
+                optionpad.Parent = optionbtn;
+                
+                optionbtn.MouseButton1Click:Connect(function()
+                    selected = option;
+                    dropbtn.Text = option;
+                    callback(selected);
+                end);
+            end;
+            
+            droplist.CanvasSize = UDim2.new(0, 0, 0, #options * 30);
+        end
+    };
+end;
+
+function components:AddLabel(parent, cfg)
+    local cfg = cfg or {};
+    local text = cfg.Text or "Label";
+    local size = cfg.Size or 14;
+    local color = cfg.Color or clrs.white;
+    local separator = cfg.Separator;
+    
+    local labelframe = Instance.new("Frame");
+    labelframe.Name = "Label";
+    labelframe.Size = UDim2.new(1, 0, 0, 25);
+    labelframe.BackgroundTransparency = 1;
+    labelframe.BorderSizePixel = 0;
+    labelframe.LayoutOrder = #parent:GetChildren();
+    labelframe.Parent = parent;
+    
+    local label = Instance.new("TextLabel");
+    label.Size = UDim2.new(1, 0, 1, 0);
+    label.Position = UDim2.new(0, 0, 0, 0);
+    label.BackgroundTransparency = 1;
+    label.Text = text;
+    label.TextColor3 = color;
+    label.TextSize = size;
+    label.Font = Enum.Font.Gotham;
+    label.TextXAlignment = Enum.TextXAlignment.Left;
+    label.TextWrapped = true;
+    label.Parent = labelframe;
+    
+    registerElement(label, "texts", "white");
+    
+    -- // add separator if requested
+    if separator then
+        self:AddSeparator(parent, separator == true and {} or separator);
+    end;
+    
+    return {
+        SetText = function(newtext)
+            label.Text = newtext;
+        end,
+        SetColor = function(newcolor)
+            label.TextColor3 = newcolor;
         end
     };
 end;
