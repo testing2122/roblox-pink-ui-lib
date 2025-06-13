@@ -643,15 +643,30 @@ function components:AddDropdown(parent, cfg)
     arrow.Font = Enum.Font.Gotham;
     arrow.Parent = dropbtn;
     
-    -- // FIXED: Create dropdown list positioned below button
+    -- // Find the main UI container for proper positioning
+    local function findMainContainer()
+        local current = parent;
+        while current and current.Parent do
+            if current.Name == "PinkUI" or current:FindFirstChild("Main") then
+                return current;
+            end;
+            current = current.Parent;
+        end;
+        return game:GetService("CoreGui");
+    end;
+    
+    local mainContainer = findMainContainer();
+    
+    -- // WORKING dropdown list - positioned below button
     local droplist = Instance.new("Frame");
     droplist.Size = UDim2.new(0, 0, 0, 0);
+    droplist.Position = UDim2.new(0, 0, 1, 5); -- 5 pixels below the button
     droplist.BackgroundColor3 = clrs.secondary;
     droplist.BorderSizePixel = 0;
     droplist.Visible = false;
     droplist.ZIndex = 1000;
     droplist.ClipsDescendants = true;
-    droplist.Parent = game:GetService("CoreGui");
+    droplist.Parent = mainContainer;
     
     registerElement(droplist, "secondaries");
     
@@ -688,26 +703,28 @@ function components:AddDropdown(parent, cfg)
     local isopen = false;
     local maxHeight = math.min(#options * 30, 150);
     
-    -- // FIXED: Position dropdown below button
+    -- // Position dropdown relative to button
     local function positionDropdown()
         local btnPos = dropbtn.AbsolutePosition;
         local btnSize = dropbtn.AbsoluteSize;
         local screenSize = workspace.CurrentCamera.ViewportSize;
         
+        -- Calculate position in screen coordinates
         local xPos = btnPos.X;
-        local yPos = btnPos.Y + btnSize.Y + 2; -- Position directly below
+        local yPos = btnPos.Y + btnSize.Y + 5;
         
-        -- Check bounds
+        -- Check if dropdown would go off screen
         if yPos + maxHeight > screenSize.Y then
-            yPos = btnPos.Y - maxHeight - 2; -- Position above if no room below
+            yPos = btnPos.Y - maxHeight - 5; -- Position above
         end;
         
         if xPos + btnSize.X > screenSize.X then
             xPos = screenSize.X - btnSize.X;
         end;
         
+        -- Set position and size
         droplist.Position = UDim2.new(0, xPos, 0, yPos);
-        droplist.Size = UDim2.new(0, btnSize.X, 0, 0);
+        droplist.Size = UDim2.new(0, btnSize.X, 0, 0); -- Start with 0 height
     end;
     
     -- // create option buttons
