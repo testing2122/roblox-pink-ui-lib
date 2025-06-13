@@ -654,3 +654,6 @@ function components:AddInput(parent, cfg)
         end
     };
 end;
+
+-- // return the components module
+return components;
