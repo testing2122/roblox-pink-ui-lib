@@ -98,6 +98,7 @@ Components:AddToggle(visualsbox, {
     end
 });
 
+-- // FIXED theme dropdown - now properly applies themes
 Components:AddDropdown(visualsbox, {
     Name = "UI Theme",
     Description = "Choose your preferred color theme",
@@ -106,10 +107,13 @@ Components:AddDropdown(visualsbox, {
     Separator = true,
     Callback = function(selected)
         print("Theme changed to:", selected);
-        -- Apply the selected theme
-        if Themes[selected] then
-            Components:ApplyTheme(Themes[selected]);
+        -- Apply the selected theme using the correct method
+        local selectedTheme = Themes:GetTheme(selected);
+        if selectedTheme then
+            Components:ApplyTheme(selectedTheme);
             print("Applied", selected, "theme successfully!");
+        else
+            warn("Theme", selected, "not found!");
         end;
     end
 });
@@ -305,6 +309,7 @@ KeybindComponent:AddKeybind(keybindbox, {
 
 print("Pink UI Library loaded successfully!");
 print("- Dropdown positioning fixed");
-print("- Theme switching enabled");
+print("- Theme switching enabled and working");
 print("- All components working");
 print("- Keybind system active");
+print("- Try selecting different themes from the UI Theme dropdown!");
