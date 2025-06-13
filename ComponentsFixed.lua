@@ -188,3 +188,119 @@ function components:AddSeparator(parent, cfg)
     
     return sepframe;
 end;
+
+-- // add components to box content
+function components:AddToggle(parent, cfg)
+    local cfg = cfg or {};
+    local name = cfg.Name or "Toggle";
+    local desc = cfg.Description or "";
+    local default = cfg.Default or false;
+    local callback = cfg.Callback or function() end;
+    local separator = cfg.Separator;
+    
+    local toggleframe = Instance.new("Frame");
+    toggleframe.Name = name;
+    toggleframe.Size = UDim2.new(1, 0, 0, desc ~= "" and 65 or 45);
+    toggleframe.BackgroundTransparency = 1;
+    toggleframe.BorderSizePixel = 0;
+    toggleframe.LayoutOrder = #parent:GetChildren();
+    toggleframe.Parent = parent;
+    
+    -- // toggle label with conditional color
+    local togglelbl = Instance.new("TextLabel");
+    togglelbl.Size = UDim2.new(1, -60, 0, 20);
+    togglelbl.Position = UDim2.new(0, 0, 0, 5);
+    togglelbl.BackgroundTransparency = 1;
+    togglelbl.Text = name;
+    togglelbl.TextColor3 = default and clrs.white or clrs.toggleoff;
+    togglelbl.TextSize = 14;
+    togglelbl.Font = Enum.Font.GothamMedium;
+    togglelbl.TextXAlignment = Enum.TextXAlignment.Left;
+    togglelbl.Parent = toggleframe;
+    
+    registerElement(togglelbl, "texts", default and "white" or "toggleoff");
+    
+    -- // description
+    if desc ~= "" then
+        local desclbl = Instance.new("TextLabel");
+        desclbl.Size = UDim2.new(1, -60, 0, 15);
+        desclbl.Position = UDim2.new(0, 0, 0, 25);
+        desclbl.BackgroundTransparency = 1;
+        desclbl.Text = desc;
+        desclbl.TextColor3 = clrs.grey;
+        desclbl.TextSize = 12;
+        desclbl.Font = Enum.Font.Gotham;
+        desclbl.TextXAlignment = Enum.TextXAlignment.Left;
+        desclbl.Parent = toggleframe;
+        
+        registerElement(desclbl, "texts", "grey");
+    end;
+    
+    -- // toggle switch
+    local togglebtn = Instance.new("TextButton");
+    togglebtn.Size = UDim2.new(0, 45, 0, 22);
+    togglebtn.Position = UDim2.new(1, -45, 0, 5);
+    togglebtn.BackgroundColor3 = default and clrs.pink or clrs.accent;
+    togglebtn.BorderSizePixel = 0;
+    togglebtn.Text = "";
+    togglebtn.Parent = toggleframe;
+    
+    registerElement(togglebtn, default and "pinks" or "accents");
+    
+    local togglecorner = Instance.new("UICorner");
+    togglecorner.CornerRadius = UDim.new(0, 11);
+    togglecorner.Parent = togglebtn;
+    
+    -- // toggle circle
+    local togglecircle = Instance.new("Frame");
+    togglecircle.Size = UDim2.new(0, 18, 0, 18);
+    togglecircle.Position = default and UDim2.new(1, -20, 0.5, -9) or UDim2.new(0, 2, 0.5, -9);
+    togglecircle.BackgroundColor3 = clrs.white;
+    togglecircle.BorderSizePixel = 0;
+    togglecircle.Parent = togglebtn;
+    
+    local circlecorner = Instance.new("UICorner");
+    circlecorner.CornerRadius = UDim.new(0, 9);
+    circlecorner.Parent = togglecircle;
+    
+    local enabled = default;
+    
+    togglebtn.MouseButton1Click:Connect(function()
+        enabled = not enabled;
+        
+        if enabled then
+            createtween(togglebtn, twinfo.med, {BackgroundColor3 = clrs.pink}):Play();
+            createtween(togglecircle, twinfo.med, {Position = UDim2.new(1, -20, 0.5, -9)}):Play();
+            createtween(togglelbl, twinfo.med, {TextColor3 = clrs.white}):Play();
+        else
+            createtween(togglebtn, twinfo.med, {BackgroundColor3 = clrs.accent}):Play();
+            createtween(togglecircle, twinfo.med, {Position = UDim2.new(0, 2, 0.5, -9)}):Play();
+            createtween(togglelbl, twinfo.med, {TextColor3 = clrs.toggleoff}):Play();
+        end;
+        
+        callback(enabled);
+    end);
+    
+    -- // add separator if requested
+    if separator then
+        self:AddSeparator(parent, separator == true and {} or separator);
+    end;
+    
+    return {
+        SetValue = function(value)
+            enabled = value;
+            if enabled then
+                createtween(togglebtn, twinfo.med, {BackgroundColor3 = clrs.pink}):Play();
+                createtween(togglecircle, twinfo.med, {Position = UDim2.new(1, -20, 0.5, -9)}):Play();
+                createtween(togglelbl, twinfo.med, {TextColor3 = clrs.white}):Play();
+            else
+                createtween(togglebtn, twinfo.med, {BackgroundColor3 = clrs.accent}):Play();
+                createtween(togglecircle, twinfo.med, {Position = UDim2.new(0, 2, 0.5, -9)}):Play();
+                createtween(togglelbl, twinfo.med, {TextColor3 = clrs.toggleoff}):Play();
+            end;
+        end,
+        GetValue = function()
+            return enabled;
+        end
+    };
+end;
