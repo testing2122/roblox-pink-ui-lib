@@ -576,14 +576,15 @@ function components:AddDropdown(parent, cfg)
     arrow.Font = Enum.Font.Gotham;
     arrow.Parent = dropbtn;
     
-    -- // dropdown list
+    -- // FIXED: Create dropdown list as overlay without affecting layout
     local droplist = Instance.new("Frame");
-    droplist.Size = UDim2.new(1, 0, 0, math.min(#options * 30, 150));
+    droplist.Size = UDim2.new(1, 0, 0, 0); -- Start with 0 height
     droplist.Position = UDim2.new(0, 0, 1, 5);
     droplist.BackgroundColor3 = clrs.secondary;
     droplist.BorderSizePixel = 0;
     droplist.Visible = false;
-    droplist.ZIndex = 10;
+    droplist.ZIndex = 100; -- High ZIndex to appear above other elements
+    droplist.ClipsDescendants = true; -- Clip content when animating
     droplist.Parent = dropbtn;
     
     local listcorner = Instance.new("UICorner");
@@ -617,20 +618,7 @@ function components:AddDropdown(parent, cfg)
     
     local selected = default;
     local isopen = false;
-    
-    -- // Function to expand parent container when dropdown opens
-    local function expandParent(expand)
-        local parentBox = dropframe.Parent;
-        if parentBox and parentBox:IsA("ScrollingFrame") then
-            local currentSize = dropframe.Size;
-            local expandHeight = expand and math.min(#options * 30, 150) or 0;
-            
-            createtween(dropframe, twinfo.fast, {
-                Size = UDim2.new(currentSize.X.Scale, currentSize.X.Offset, 
-                                currentSize.Y.Scale, currentSize.Y.Offset + expandHeight)
-            }):Play();
-        end;
-    end;
+    local maxHeight = math.min(#options * 30, 150);
     
     -- // create option buttons
     for i, option in ipairs(options) do
@@ -675,7 +663,6 @@ function components:AddDropdown(parent, cfg)
             
             -- // close dropdown
             isopen = false;
-            expandParent(false);
             createtween(droplist, twinfo.fast, {Size = UDim2.new(1, 0, 0, 0)}):Play();
             createtween(arrow, twinfo.fast, {Rotation = 0}):Play();
             wait(0.25);
@@ -690,11 +677,9 @@ function components:AddDropdown(parent, cfg)
         
         if isopen then
             droplist.Visible = true;
-            expandParent(true);
-            createtween(droplist, twinfo.fast, {Size = UDim2.new(1, 0, 0, math.min(#options * 30, 150))}):Play();
+            createtween(droplist, twinfo.fast, {Size = UDim2.new(1, 0, 0, maxHeight)}):Play();
             createtween(arrow, twinfo.fast, {Rotation = 180}):Play();
         else
-            expandParent(false);
             createtween(droplist, twinfo.fast, {Size = UDim2.new(1, 0, 0, 0)}):Play();
             createtween(arrow, twinfo.fast, {Rotation = 0}):Play();
             wait(0.25);
@@ -730,6 +715,7 @@ function components:AddDropdown(parent, cfg)
         end,
         SetOptions = function(newoptions)
             options = newoptions;
+            maxHeight = math.min(#options * 30, 150);
             
             -- // clear existing options
             for _, child in ipairs(scrollframe:GetChildren()) do
@@ -781,7 +767,6 @@ function components:AddDropdown(parent, cfg)
                     
                     -- // close dropdown
                     isopen = false;
-                    expandParent(false);
                     createtween(droplist, twinfo.fast, {Size = UDim2.new(1, 0, 0, 0)}):Play();
                     createtween(arrow, twinfo.fast, {Rotation = 0}):Play();
                     wait(0.25);
@@ -792,7 +777,6 @@ function components:AddDropdown(parent, cfg)
             end;
             
             scrollframe.CanvasSize = UDim2.new(0, 0, 0, #options * 30);
-            droplist.Size = UDim2.new(1, 0, 0, math.min(#options * 30, 150));
         end
     };
 end;
