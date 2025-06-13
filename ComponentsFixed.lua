@@ -665,7 +665,7 @@ function components:AddDropdown(parent, cfg)
     droplist.BorderSizePixel = 0;
     droplist.Visible = false;
     droplist.ZIndex = 1000;
-    droplist.ClipsDescendants = true;
+    droplist.ClipsDescendants = false; -- FIXED: Allow content to be visible
     droplist.Parent = screenGui;
     
     registerElement(droplist, "secondaries");
@@ -679,7 +679,7 @@ function components:AddDropdown(parent, cfg)
     liststroke.Thickness = 1;
     liststroke.Parent = droplist;
     
-    -- // scrolling frame for options
+    -- // FIXED scrolling frame for options - removed unnecessary corner
     local scrollframe = Instance.new("ScrollingFrame");
     scrollframe.Size = UDim2.new(1, 0, 1, 0);
     scrollframe.Position = UDim2.new(0, 0, 0, 0);
@@ -689,11 +689,8 @@ function components:AddDropdown(parent, cfg)
     scrollframe.ScrollBarImageColor3 = clrs.pink;
     scrollframe.CanvasSize = UDim2.new(0, 0, 0, #options * 30);
     scrollframe.AutomaticCanvasSize = Enum.AutomaticSize.Y;
+    scrollframe.ClipsDescendants = true;
     scrollframe.Parent = droplist;
-    
-    local scrollcorner = Instance.new("UICorner");
-    scrollcorner.CornerRadius = UDim.new(0, 6);
-    scrollcorner.Parent = scrollframe;
     
     local optionlayout = Instance.new("UIListLayout");
     optionlayout.SortOrder = Enum.SortOrder.LayoutOrder;
@@ -733,7 +730,7 @@ function components:AddDropdown(parent, cfg)
         droplist.Size = UDim2.new(0, btnSize.X, 0, 0); -- Start with 0 height for animation
     end;
     
-    -- // create option buttons
+    -- // FIXED create option buttons with proper visibility
     local function createOptions()
         -- Clear existing options
         for _, child in ipairs(scrollframe:GetChildren()) do
@@ -745,25 +742,26 @@ function components:AddDropdown(parent, cfg)
         for i, option in ipairs(options) do
             local optionbtn = Instance.new("TextButton");
             optionbtn.Size = UDim2.new(1, 0, 0, 30);
-            optionbtn.BackgroundColor3 = option == selected and clrs.pink or Color3.new(0, 0, 0);
-            optionbtn.BackgroundTransparency = option == selected and 0.7 or 1;
+            optionbtn.BackgroundColor3 = clrs.accent; -- FIXED: Use accent color instead of transparent
+            optionbtn.BackgroundTransparency = option == selected and 0.3 or 0.8; -- FIXED: Proper transparency values
             optionbtn.BorderSizePixel = 0;
             optionbtn.Text = option;
             optionbtn.TextColor3 = option == selected and clrs.pink or clrs.white;
             optionbtn.TextSize = 13;
             optionbtn.Font = Enum.Font.Gotham;
             optionbtn.LayoutOrder = i;
+            optionbtn.ZIndex = 1001; -- FIXED: Ensure options are above dropdown
             optionbtn.Parent = scrollframe;
             
             optionbtn.MouseEnter:Connect(function()
                 if option ~= selected then
-                    createtween(optionbtn, twinfo.fast, {BackgroundTransparency = 0.9, TextColor3 = clrs.lightpink}):Play();
+                    createtween(optionbtn, twinfo.fast, {BackgroundTransparency = 0.5, TextColor3 = clrs.lightpink}):Play();
                 end;
             end);
             
             optionbtn.MouseLeave:Connect(function()
                 if option ~= selected then
-                    createtween(optionbtn, twinfo.fast, {BackgroundTransparency = 1, TextColor3 = clrs.white}):Play();
+                    createtween(optionbtn, twinfo.fast, {BackgroundTransparency = 0.8, TextColor3 = clrs.white}):Play();
                 end;
             end);
             
@@ -772,9 +770,9 @@ function components:AddDropdown(parent, cfg)
                 for _, btn in ipairs(scrollframe:GetChildren()) do
                     if btn:IsA("TextButton") then
                         if btn.Text == option then
-                            createtween(btn, twinfo.fast, {BackgroundTransparency = 0.7, TextColor3 = clrs.pink}):Play();
+                            createtween(btn, twinfo.fast, {BackgroundTransparency = 0.3, TextColor3 = clrs.pink}):Play();
                         else
-                            createtween(btn, twinfo.fast, {BackgroundTransparency = 1, TextColor3 = clrs.white}):Play();
+                            createtween(btn, twinfo.fast, {BackgroundTransparency = 0.8, TextColor3 = clrs.white}):Play();
                         end;
                     end;
                 end;
@@ -860,9 +858,9 @@ function components:AddDropdown(parent, cfg)
                 for _, btn in ipairs(scrollframe:GetChildren()) do
                     if btn:IsA("TextButton") then
                         if btn.Text == option then
-                            createtween(btn, twinfo.fast, {BackgroundTransparency = 0.7, TextColor3 = clrs.pink}):Play();
+                            createtween(btn, twinfo.fast, {BackgroundTransparency = 0.3, TextColor3 = clrs.pink}):Play();
                         else
-                            createtween(btn, twinfo.fast, {BackgroundTransparency = 1, TextColor3 = clrs.white}):Play();
+                            createtween(btn, twinfo.fast, {BackgroundTransparency = 0.8, TextColor3 = clrs.white}):Play();
                         end;
                     end;
                 end;
