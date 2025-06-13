@@ -23,6 +23,89 @@ local clrs = {
     separator = Color3.fromRGB(35, 35, 40)
 };
 
+-- // store UI elements for theme updates
+local uiElements = {
+    boxTitles = {},
+    underlines = {},
+    hoverlines = {},
+    tabButtons = {},
+    tabIcons = {},
+    tabLabels = {},
+    gradientButton = nil,
+    titleGradient = nil
+};
+
+-- // theme application function
+function pnkui:ApplyTheme(newTheme)
+    -- Update color table
+    for key, value in pairs(newTheme) do
+        clrs[key] = value;
+    end;
+    
+    local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out);
+    
+    -- Update box titles to use theme color
+    for _, titleElement in pairs(uiElements.boxTitles) do
+        if titleElement and titleElement.Parent then
+            tweenserv:Create(titleElement, tweenInfo, {TextColor3 = clrs.pink}):Play();
+        end;
+    end;
+    
+    -- Update underlines to use theme color
+    for _, underline in pairs(uiElements.underlines) do
+        if underline and underline.Parent then
+            tweenserv:Create(underline, tweenInfo, {BackgroundColor3 = clrs.pink}):Play();
+        end;
+    end;
+    
+    -- Update hover lines to use theme color
+    for _, hoverline in pairs(uiElements.hoverlines) do
+        if hoverline and hoverline.Parent then
+            tweenserv:Create(hoverline, tweenInfo, {BackgroundColor3 = clrs.grey}):Play();
+        end;
+    end;
+    
+    -- Update tab buttons and labels
+    for _, data in pairs(uiElements.tabButtons) do
+        if data.button and data.button.Parent then
+            local isActive = data.isActive;
+            if isActive then
+                tweenserv:Create(data.label, tweenInfo, {TextColor3 = clrs.pink}):Play();
+                if data.icon then
+                    tweenserv:Create(data.icon, tweenInfo, {TextColor3 = clrs.pink}):Play();
+                end;
+            else
+                tweenserv:Create(data.label, tweenInfo, {TextColor3 = clrs.darkgrey}):Play();
+                if data.icon then
+                    tweenserv:Create(data.icon, tweenInfo, {TextColor3 = clrs.darkgrey}):Play();
+                end;
+            end;
+        end;
+    end;
+    
+    -- Update gradient button color
+    if uiElements.gradientButton and uiElements.gradientButton.Parent then
+        local isEnabled = uiElements.gradientButton.TextColor3 == clrs.pink or 
+                         (uiElements.gradientButton.TextColor3.R > 0.8 and 
+                          uiElements.gradientButton.TextColor3.G > 0.4 and 
+                          uiElements.gradientButton.TextColor3.B > 0.6);
+        tweenserv:Create(uiElements.gradientButton, tweenInfo, {
+            TextColor3 = isEnabled and clrs.pink or clrs.grey
+        }):Play();
+    end;
+    
+    -- Update title gradient
+    if uiElements.titleGradient and uiElements.titleGradient.Parent then
+        uiElements.titleGradient.Color = ColorSequence.new{
+            ColorSequenceKeypoint.new(0, clrs.pink),
+            ColorSequenceKeypoint.new(0.5, clrs.lightpink),
+            ColorSequenceKeypoint.new(1, clrs.pink)
+        };
+    end;
+    
+    print("🎨 Theme applied successfully!");
+end;
+
 -- // tween configs
 local twinfo = {
     fast = TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -109,6 +192,7 @@ function pnkui:CreateWindow(cfg)
         };
         titlegrad.Offset = Vector2.new(-1, 0);
         titlegrad.Parent = titlelbl;
+        uiElements.titleGradient = titlegrad;
         
         -- // smooth gradient animation (left to right)
         local function animateGradient()
@@ -141,6 +225,8 @@ function pnkui:CreateWindow(cfg)
     gradToggle.Font = Enum.Font.GothamBold;
     gradToggle.Parent = titlebar;
     
+    uiElements.gradientButton = gradToggle;
+    
     local gradCorner = Instance.new("UICorner");
     gradCorner.CornerRadius = UDim.new(0, 6);
     gradCorner.Parent = gradToggle;
@@ -156,6 +242,7 @@ function pnkui:CreateWindow(cfg)
                     ColorSequenceKeypoint.new(1, clrs.pink)
                 };
                 titlegrad.Offset = Vector2.new(-1, 0);
+                uiElements.titleGradient = titlegrad;
             end;
             titlegrad.Parent = titlelbl;
             gradToggle.TextColor3 = clrs.pink;
@@ -411,6 +498,8 @@ function pnkui:CreateWindow(cfg)
         underline.BorderSizePixel = 0;
         underline.Parent = tabbtn;
         
+        table.insert(uiElements.underlines, underline);
+        
         local undercorner = Instance.new("UICorner");
         undercorner.CornerRadius = UDim.new(0, 2);
         undercorner.Parent = underline;
@@ -423,6 +512,8 @@ function pnkui:CreateWindow(cfg)
         hoverline.BackgroundColor3 = clrs.grey;
         hoverline.BorderSizePixel = 0;
         hoverline.Parent = tabbtn;
+        
+        table.insert(uiElements.hoverlines, hoverline);
         
         local hovercorner = Instance.new("UICorner");
         hovercorner.CornerRadius = UDim.new(0, 1);
@@ -495,6 +586,15 @@ function pnkui:CreateWindow(cfg)
         rightpad.PaddingBottom = UDim.new(0, 8);
         rightpad.Parent = rightcolumn;
         
+        -- // register tab elements for theme updates
+        local tabData = {
+            button = tabbtn,
+            label = tablbl,
+            icon = iconlbl,
+            isActive = false
+        };
+        table.insert(uiElements.tabButtons, tabData);
+        
         -- // tab functionality
         local function selecttab()
             -- // deselect all tabs first
@@ -506,6 +606,14 @@ function pnkui:CreateWindow(cfg)
                 createtween(tab.underline, twinfo.med, {Size = UDim2.new(0, 0, 0, 3)}):Play();
                 createtween(tab.hoverline, twinfo.fast, {Size = UDim2.new(0, 0, 0, 2)}):Play();
                 tab.content.Visible = false;
+                
+                -- Update tab data
+                for _, tabButtonData in pairs(uiElements.tabButtons) do
+                    if tabButtonData.button == tab.button then
+                        tabButtonData.isActive = false;
+                        break;
+                    end;
+                end;
             end;
             
             -- // select this tab
@@ -517,6 +625,14 @@ function pnkui:CreateWindow(cfg)
             
             tabcontent.Visible = true;
             window.activetab = name;
+            
+            -- Update tab data
+            for _, tabButtonData in pairs(uiElements.tabButtons) do
+                if tabButtonData.button == tabbtn then
+                    tabButtonData.isActive = true;
+                    break;
+                end;
+            end;
         end;
         
         -- // hover effects (fixed to prevent white underline on selected tabs)
@@ -599,17 +715,20 @@ function pnkui:CreateWindow(cfg)
             boxstroke.Transparency = 0.6;
             boxstroke.Parent = box;
             
-            -- // box title
+            -- // box title - FIXED to use theme color
             local boxtitle = Instance.new("TextLabel");
             boxtitle.Size = UDim2.new(1, -20, 0, 30);
             boxtitle.Position = UDim2.new(0, 10, 0, 10);
             boxtitle.BackgroundTransparency = 1;
             boxtitle.Text = name;
-            boxtitle.TextColor3 = clrs.lightpink;
+            boxtitle.TextColor3 = clrs.pink; -- Changed from clrs.lightpink to clrs.pink
             boxtitle.TextSize = 16;
             boxtitle.Font = Enum.Font.GothamBold;
             boxtitle.TextXAlignment = Enum.TextXAlignment.Left;
             boxtitle.Parent = box;
+            
+            -- Register box title for theme updates
+            table.insert(uiElements.boxTitles, boxtitle);
             
             -- // box content
             local boxcontent = Instance.new("ScrollingFrame");
