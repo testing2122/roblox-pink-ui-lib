@@ -30,7 +30,7 @@ local uiElements = {
     scrollbars = {}
 };
 
--- // ENHANCED theme application function
+-- // ENHANCED theme application function with comprehensive UI coverage
 function components:ApplyTheme(newTheme)
     -- Update color table
     for key, value in pairs(newTheme) do
@@ -97,7 +97,7 @@ function components:ApplyTheme(newTheme)
         end;
     end;
     
-    -- Try to update main UI if it exists
+    -- COMPREHENSIVE main UI update
     local screenGui = game:GetService("CoreGui"):FindFirstChild("PinkUI");
     if screenGui then
         local main = screenGui:FindFirstChild("Main");
@@ -105,10 +105,13 @@ function components:ApplyTheme(newTheme)
             -- Update main window colors
             tweenserv:Create(main, tweenInfo, {BackgroundColor3 = clrs.bg}):Play();
             
-            -- Update title gradient if it exists
+            -- Update title and subtitle
             local titlebar = main:FindFirstChild("TitleBar");
             if titlebar then
                 local title = titlebar:FindFirstChild("Title");
+                local subtitle = titlebar:FindFirstChild("Subtitle");
+                
+                -- Update title gradient
                 if title and title:FindFirstChild("UIGradient") then
                     local gradient = title:FindFirstChild("UIGradient");
                     gradient.Color = ColorSequence.new{
@@ -117,24 +120,134 @@ function components:ApplyTheme(newTheme)
                         ColorSequenceKeypoint.new(1, clrs.pink)
                     };
                 end;
+                
+                -- Update subtitle color
+                if subtitle then
+                    tweenserv:Create(subtitle, tweenInfo, {TextColor3 = clrs.grey}):Play();
+                end;
             end;
             
-            -- Update all separators in main UI
-            for _, child in pairs(main:GetDescendants()) do
-                if child.Name:find("Separator") and child:IsA("Frame") then
-                    tweenserv:Create(child, tweenInfo, {BackgroundColor3 = clrs.separator}):Play();
+            -- Update tab container and tabs
+            local tabsContainer = main:FindFirstChild("Tabs");
+            if tabsContainer then
+                -- Update tab container background
+                tweenserv:Create(tabsContainer, tweenInfo, {BackgroundColor3 = clrs.secondary}):Play();
+                
+                -- Update all tab buttons and text
+                for _, tab in pairs(tabsContainer:GetChildren()) do
+                    if tab:IsA("TextButton") and tab.Name ~= "TabLine" then
+                        -- Update tab background
+                        tweenserv:Create(tab, tweenInfo, {BackgroundColor3 = clrs.accent}):Play();
+                        
+                        -- Check if this is the active tab
+                        local isActive = tab.BackgroundTransparency < 0.5;
+                        if isActive then
+                            tweenserv:Create(tab, tweenInfo, {BackgroundColor3 = clrs.secondary, TextColor3 = clrs.pink}):Play();
+                        else
+                            tweenserv:Create(tab, tweenInfo, {TextColor3 = clrs.grey}):Play();
+                        end;
+                        
+                        -- Update tab icon if it exists
+                        local icon = tab:FindFirstChild("Icon");
+                        if icon then
+                            tweenserv:Create(icon, tweenInfo, {TextColor3 = isActive and clrs.pink or clrs.grey}):Play();
+                        end;
+                    end;
                 end;
-                if child:IsA("UIStroke") then
-                    tweenserv:Create(child, tweenInfo, {Color = clrs.separator}):Play();
+                
+                -- Update tab underline
+                local tabLine = tabsContainer:FindFirstChild("TabLine");
+                if tabLine then
+                    tweenserv:Create(tabLine, tweenInfo, {BackgroundColor3 = clrs.pink}):Play();
                 end;
-                if child:IsA("ScrollingFrame") then
-                    tweenserv:Create(child, tweenInfo, {ScrollBarImageColor3 = clrs.pink}):Play();
+            end;
+            
+            -- Update content area
+            local contentArea = main:FindFirstChild("Content");
+            if contentArea then
+                tweenserv:Create(contentArea, tweenInfo, {BackgroundColor3 = clrs.bg}):Play();
+                
+                -- Update all tab content
+                for _, tabContent in pairs(contentArea:GetChildren()) do
+                    if tabContent:IsA("Frame") and tabContent.Name:find("Tab") then
+                        tweenserv:Create(tabContent, tweenInfo, {BackgroundColor3 = clrs.bg}):Play();
+                        
+                        -- Update all boxes in this tab
+                        for _, box in pairs(tabContent:GetChildren()) do
+                            if box:IsA("Frame") and box.Name:find("Box") then
+                                -- Update box background
+                                tweenserv:Create(box, tweenInfo, {BackgroundColor3 = clrs.secondary}):Play();
+                                
+                                -- Update box title if it exists
+                                local titleLabel = box:FindFirstChild("Title");
+                                if titleLabel then
+                                    tweenserv:Create(titleLabel, tweenInfo, {TextColor3 = clrs.white}):Play();
+                                end;
+                                
+                                -- Update box content area
+                                local content = box:FindFirstChild("Content");
+                                if content then
+                                    tweenserv:Create(content, tweenInfo, {BackgroundColor3 = clrs.secondary}):Play();
+                                end;
+                            end;
+                        end;
+                    end;
+                end;
+            end;
+            
+            -- Update ALL text elements in the UI comprehensively
+            for _, descendant in pairs(main:GetDescendants()) do
+                if descendant:IsA("TextLabel") then
+                    -- Determine text color based on context
+                    local name = descendant.Name:lower();
+                    local parent = descendant.Parent;
+                    
+                    if name:find("title") or (parent and parent.Name:find("TitleBar")) then
+                        -- Title elements stay white or use gradient
+                        if not descendant:FindFirstChild("UIGradient") then
+                            tweenserv:Create(descendant, tweenInfo, {TextColor3 = clrs.white}):Play();
+                        end;
+                    elseif name:find("subtitle") or name:find("description") or name:find("desc") then
+                        -- Subtitles and descriptions use grey
+                        tweenserv:Create(descendant, tweenInfo, {TextColor3 = clrs.grey}):Play();
+                    elseif name:find("value") or name:find("val") then
+                        -- Value displays use pink
+                        tweenserv:Create(descendant, tweenInfo, {TextColor3 = clrs.pink}):Play();
+                    else
+                        -- Default text uses white
+                        tweenserv:Create(descendant, tweenInfo, {TextColor3 = clrs.white}):Play();
+                    end;
+                elseif descendant:IsA("TextButton") then
+                    -- Update button text and backgrounds
+                    local name = descendant.Name:lower();
+                    if name:find("tab") then
+                        -- Tab buttons handled above
+                        continue;
+                    else
+                        -- Regular buttons
+                        tweenserv:Create(descendant, tweenInfo, {BackgroundColor3 = clrs.accent, TextColor3 = clrs.white}):Play();
+                    end;
+                elseif descendant:IsA("TextBox") then
+                    -- Update input boxes
+                    tweenserv:Create(descendant, tweenInfo, {BackgroundColor3 = clrs.accent, TextColor3 = clrs.white}):Play();
+                elseif descendant:IsA("Frame") then
+                    -- Update frame backgrounds based on context
+                    local name = descendant.Name:lower();
+                    if name:find("separator") then
+                        tweenserv:Create(descendant, tweenInfo, {BackgroundColor3 = clrs.separator}):Play();
+                    elseif name:find("box") or name:find("container") then
+                        tweenserv:Create(descendant, tweenInfo, {BackgroundColor3 = clrs.secondary}):Play();
+                    end;
+                elseif descendant:IsA("UIStroke") then
+                    tweenserv:Create(descendant, tweenInfo, {Color = clrs.separator}):Play();
+                elseif descendant:IsA("ScrollingFrame") then
+                    tweenserv:Create(descendant, tweenInfo, {ScrollBarImageColor3 = clrs.pink, BackgroundColor3 = clrs.secondary}):Play();
                 end;
             end;
         end;
     end;
     
-    print("Theme applied successfully!");
+    print("🎨 Enhanced theme applied successfully! All UI elements updated.");
 end;
 
 -- // helper function to register UI elements
