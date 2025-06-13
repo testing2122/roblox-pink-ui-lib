@@ -398,3 +398,160 @@ function components:AddButton(parent, cfg)
     
     return btn;
 end;
+
+function components:AddSlider(parent, cfg)
+    local cfg = cfg or {};
+    local name = cfg.Name or "Slider";
+    local desc = cfg.Description or "";
+    local min = cfg.Min or 0;
+    local max = cfg.Max or 100;
+    local default = cfg.Default or min;
+    local increment = cfg.Increment or 1;
+    local callback = cfg.Callback or function() end;
+    local separator = cfg.Separator;
+    
+    local sliderframe = Instance.new("Frame");
+    sliderframe.Name = name;
+    sliderframe.Size = UDim2.new(1, 0, 0, desc ~= "" and 75 or 55);
+    sliderframe.BackgroundTransparency = 1;
+    sliderframe.BorderSizePixel = 0;
+    sliderframe.LayoutOrder = #parent:GetChildren();
+    sliderframe.Parent = parent;
+    
+    -- // slider label
+    local sliderlbl = Instance.new("TextLabel");
+    sliderlbl.Size = UDim2.new(1, -60, 0, 20);
+    sliderlbl.Position = UDim2.new(0, 0, 0, 5);
+    sliderlbl.BackgroundTransparency = 1;
+    sliderlbl.Text = name;
+    sliderlbl.TextColor3 = clrs.white;
+    sliderlbl.TextSize = 14;
+    sliderlbl.Font = Enum.Font.GothamMedium;
+    sliderlbl.TextXAlignment = Enum.TextXAlignment.Left;
+    sliderlbl.Parent = sliderframe;
+    
+    registerElement(sliderlbl, "texts", "white");
+    
+    -- // value label
+    local valuelbl = Instance.new("TextLabel");
+    valuelbl.Size = UDim2.new(0, 60, 0, 20);
+    valuelbl.Position = UDim2.new(1, -60, 0, 5);
+    valuelbl.BackgroundTransparency = 1;
+    valuelbl.Text = tostring(default);
+    valuelbl.TextColor3 = clrs.pink;
+    valuelbl.TextSize = 14;
+    valuelbl.Font = Enum.Font.GothamBold;
+    valuelbl.TextXAlignment = Enum.TextXAlignment.Right;
+    valuelbl.Parent = sliderframe;
+    
+    registerElement(valuelbl, "texts", "pink");
+    
+    -- // description
+    if desc ~= "" then
+        local desclbl = Instance.new("TextLabel");
+        desclbl.Size = UDim2.new(1, 0, 0, 15);
+        desclbl.Position = UDim2.new(0, 0, 0, 25);
+        desclbl.BackgroundTransparency = 1;
+        desclbl.Text = desc;
+        desclbl.TextColor3 = clrs.grey;
+        desclbl.TextSize = 12;
+        desclbl.Font = Enum.Font.Gotham;
+        desclbl.TextXAlignment = Enum.TextXAlignment.Left;
+        desclbl.Parent = sliderframe;
+        
+        registerElement(desclbl, "texts", "grey");
+    end;
+    
+    -- // slider track
+    local slidertrack = Instance.new("Frame");
+    slidertrack.Size = UDim2.new(1, 0, 0, 6);
+    slidertrack.Position = UDim2.new(0, 0, 1, desc ~= "" and -15 or -10);
+    slidertrack.BackgroundColor3 = clrs.accent;
+    slidertrack.BorderSizePixel = 0;
+    slidertrack.Parent = sliderframe;
+    
+    registerElement(slidertrack, "accents");
+    
+    local trackcorner = Instance.new("UICorner");
+    trackcorner.CornerRadius = UDim.new(0, 3);
+    trackcorner.Parent = slidertrack;
+    
+    -- // slider fill
+    local sliderfill = Instance.new("Frame");
+    sliderfill.Size = UDim2.new((default - min) / (max - min), 0, 1, 0);
+    sliderfill.Position = UDim2.new(0, 0, 0, 0);
+    sliderfill.BackgroundColor3 = clrs.pink;
+    sliderfill.BorderSizePixel = 0;
+    sliderfill.Parent = slidertrack;
+    
+    registerElement(sliderfill, "pinks");
+    
+    local fillcorner = Instance.new("UICorner");
+    fillcorner.CornerRadius = UDim.new(0, 3);
+    fillcorner.Parent = sliderfill;
+    
+    -- // slider handle
+    local sliderhandle = Instance.new("Frame");
+    sliderhandle.Size = UDim2.new(0, 16, 0, 16);
+    sliderhandle.Position = UDim2.new((default - min) / (max - min), -8, 0.5, -8);
+    sliderhandle.BackgroundColor3 = clrs.white;
+    sliderhandle.BorderSizePixel = 0;
+    sliderhandle.Parent = slidertrack;
+    
+    local handlecorner = Instance.new("UICorner");
+    handlecorner.CornerRadius = UDim.new(0, 8);
+    handlecorner.Parent = sliderhandle;
+    
+    local value = default;
+    local dragging = false;
+    
+    local function updateslider(input)
+        local pos = math.clamp((input.Position.X - slidertrack.AbsolutePosition.X) / slidertrack.AbsoluteSize.X, 0, 1);
+        value = math.floor((min + (max - min) * pos) / increment + 0.5) * increment;
+        value = math.clamp(value, min, max);
+        
+        local fillsize = (value - min) / (max - min);
+        createtween(sliderfill, twinfo.fast, {Size = UDim2.new(fillsize, 0, 1, 0)}):Play();
+        createtween(sliderhandle, twinfo.fast, {Position = UDim2.new(fillsize, -8, 0.5, -8)}):Play();
+        
+        valuelbl.Text = tostring(value);
+        callback(value);
+    end;
+    
+    slidertrack.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true;
+            updateslider(input);
+        end;
+    end);
+    
+    userinput.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            updateslider(input);
+        end;
+    end);
+    
+    userinput.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = false;
+        end;
+    end);
+    
+    -- // add separator if requested
+    if separator then
+        self:AddSeparator(parent, separator == true and {} or separator);
+    end;
+    
+    return {
+        SetValue = function(newvalue)
+            value = math.clamp(newvalue, min, max);
+            local fillsize = (value - min) / (max - min);
+            createtween(sliderfill, twinfo.fast, {Size = UDim2.new(fillsize, 0, 1, 0)}):Play();
+            createtween(sliderhandle, twinfo.fast, {Position = UDim2.new(fillsize, -8, 0.5, -8)}):Play();
+            valuelbl.Text = tostring(value);
+        end,
+        GetValue = function()
+            return value;
+        end
+    };
+end;
