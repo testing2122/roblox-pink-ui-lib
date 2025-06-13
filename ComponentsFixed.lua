@@ -145,3 +145,46 @@ local function registerElement(element, category, colorType)
         table.insert(uiElements[category], element);
     end;
 end;
+
+-- // tween configs
+local twinfo = {
+    fast = TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+    med = TweenInfo.new(0.35, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+    slow = TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+};
+
+local function createtween(obj, info, props)
+    return tweenserv:Create(obj, info, props);
+end;
+
+-- // add separator function
+function components:AddSeparator(parent, cfg)
+    local cfg = cfg or {};
+    local height = cfg.Height or 15;
+    local color = cfg.Color or clrs.separator;
+    local transparency = cfg.Transparency or 0;
+    
+    local sepframe = Instance.new("Frame");
+    sepframe.Name = "Separator";
+    sepframe.Size = UDim2.new(1, 0, 0, height);
+    sepframe.BackgroundTransparency = 1;
+    sepframe.BorderSizePixel = 0;
+    sepframe.LayoutOrder = #parent:GetChildren();
+    sepframe.Parent = parent;
+    
+    local sepline = Instance.new("Frame");
+    sepline.Size = UDim2.new(1, -20, 0, 1);
+    sepline.Position = UDim2.new(0, 10, 0.5, 0);
+    sepline.BackgroundColor3 = color;
+    sepline.BackgroundTransparency = transparency;
+    sepline.BorderSizePixel = 0;
+    sepline.Parent = sepframe;
+    
+    registerElement(sepline, "separators");
+    
+    local sepcorner = Instance.new("UICorner");
+    sepcorner.CornerRadius = UDim.new(0, 1);
+    sepcorner.Parent = sepline;
+    
+    return sepframe;
+end;
