@@ -50,244 +50,261 @@ local miscbox = maintab:CreateBox({
 -- // Combat Features (with grey text when disabled)
 Components:AddToggle(combatbox, {
     Name = "Auto Attack",
-    Description = "Automatically attack nearby enemies",
-    Default = false, -- Will show grey text
+    Description = "Automatically attack enemies",
+    Default = false,
     Callback = function(value)
         print("Auto Attack:", value);
-    end,
-    Separator = true
+    end
+});
+
+Components:AddToggle(combatbox, {
+    Name = "Auto Block",
+    Description = "Automatically block incoming attacks",
+    Default = true,
+    Separator = true,
+    Callback = function(value)
+        print("Auto Block:", value);
+    end
 });
 
 Components:AddSlider(combatbox, {
-    Name = "Attack Range",
-    Description = "Set the range for auto attack",
+    Name = "Attack Speed",
+    Description = "Speed of automatic attacks",
     Min = 1,
-    Max = 50,
-    Default = 10,
+    Max = 10,
+    Default = 5,
     Increment = 1,
     Callback = function(value)
-        print("Attack Range:", value);
-    end,
-    Separator = true
+        print("Attack Speed:", value);
+    end
 });
 
-Components:AddDropdown(combatbox, {
-    Name = "Weapon Type",
-    Description = "Select your preferred weapon",
-    Options = {"Sword", "Bow", "Staff", "Dagger", "Hammer"},
-    Default = "Sword",
-    Callback = function(value)
-        print("Weapon Type:", value);
+Components:AddButton(combatbox, {
+    Name = "Reset Combat",
+    Description = "Reset all combat settings",
+    Separator = {Height = 20, Color = Color3.fromRGB(255, 105, 180)},
+    Callback = function()
+        print("Combat settings reset!");
     end
 });
 
 -- // Visuals
 Components:AddToggle(visualsbox, {
-    Name = "ESP Items",
-    Description = "Highlight items on the ground",
-    Default = true, -- Will show white text
+    Name = "ESP",
+    Description = "Show enemy positions",
+    Default = false,
     Callback = function(value)
-        print("ESP Items:", value);
-    end,
-    Separator = true
-});
-
-Components:AddSlider(visualsbox, {
-    Name = "ESP Distance",
-    Description = "Maximum distance for ESP",
-    Min = 50,
-    Max = 1000,
-    Default = 450,
-    Increment = 25,
-    Callback = function(value)
-        print("ESP Distance:", value);
-    end,
-    Separator = true
+        print("ESP:", value);
+    end
 });
 
 Components:AddDropdown(visualsbox, {
-    Name = "ESP Color",
-    Description = "Choose ESP color scheme",
-    Options = {"Red", "Green", "Blue", "Pink", "Yellow", "Cyan"},
-    Default = "Red",
+    Name = "UI Theme",
+    Description = "Choose your preferred color theme",
+    Options = {"Pink", "Blue", "Purple", "Green", "Orange", "Red", "Dark", "Cyan"},
+    Default = "Pink",
+    Separator = true,
+    Callback = function(selected)
+        print("Theme changed to:", selected);
+        -- Apply the selected theme
+        if Themes[selected] then
+            Components:ApplyTheme(Themes[selected]);
+            print("Applied", selected, "theme successfully!");
+        end;
+    end
+});
+
+Components:AddSlider(visualsbox, {
+    Name = "FOV",
+    Description = "Field of view setting",
+    Min = 70,
+    Max = 120,
+    Default = 90,
+    Increment = 5,
     Callback = function(value)
-        print("ESP Color:", value);
+        print("FOV:", value);
     end
 });
 
 -- // Miscellaneous
 Components:AddInput(miscbox, {
-    Name = "Custom Message",
-    Description = "Enter a custom message",
-    Placeholder = "Type here...",
-    Default = "hi",
-    Callback = function(value)
-        print("Custom Message:", value);
-    end,
-    Separator = true
+    Name = "Player Name",
+    Description = "Enter target player name",
+    Placeholder = "Username...",
+    Default = "",
+    Callback = function(text)
+        print("Target player:", text);
+    end
 });
 
-Components:AddButton(miscbox, {
-    Name = "Send Message",
-    Description = "Send the custom message",
-    Callback = function()
-        print("Message sent!");
-    end
+Components:AddLabel(miscbox, {
+    Text = "Status: Ready",
+    Size = 14,
+    Color = Color3.fromRGB(100, 255, 100),
+    Separator = true
 });
 
 -- // Settings Tab
-local movementbox = settingstab:CreateBox({
-    Name = "Movement",
+local uibox = settingstab:CreateBox({
+    Name = "UI Settings",
     Column = "left",
+    Height = 250
+});
+
+local gameplaybox = settingstab:CreateBox({
+    Name = "Gameplay",
+    Column = "right",
     Height = 200
 });
 
-local themeBox = settingstab:CreateBox({
-    Name = "Theme Settings",
-    Column = "right",
-    Height = 300
-});
-
--- // Movement Settings
-Components:AddSlider(movementbox, {
-    Name = "Speed Multiplier",
-    Description = "Adjust movement speed",
-    Min = 1,
-    Max = 10,
-    Default = 5,
-    Increment = 0.5,
+-- // UI Settings
+Components:AddToggle(uibox, {
+    Name = "Show Notifications",
+    Description = "Display system notifications",
+    Default = true,
     Callback = function(value)
-        print("Speed Multiplier:", value);
-    end,
-    Separator = true
-});
-
-Components:AddToggle(movementbox, {
-    Name = "Teleport Enabled",
-    Description = "Enable teleportation features",
-    Default = false, -- Grey text when disabled
-    Callback = function(value)
-        print("Teleport Enabled:", value);
+        print("Notifications:", value);
     end
 });
 
-Components:AddButton(movementbox, {
-    Name = "Teleport to Spawn",
-    Callback = function()
-        print("Teleporting to spawn...");
+Components:AddSlider(uibox, {
+    Name = "UI Scale",
+    Description = "Scale of the user interface",
+    Min = 50,
+    Max = 150,
+    Default = 100,
+    Increment = 10,
+    Separator = true,
+    Callback = function(value)
+        print("UI Scale:", value, "%");
     end
 });
 
--- // Theme Settings
-local currentTheme = "Pink";
-Components:AddDropdown(themeBox, {
-    Name = "UI Theme",
-    Description = "Choose your preferred color theme",
-    Options = Themes:GetThemeNames(),
-    Default = currentTheme,
+Components:AddDropdown(uibox, {
+    Name = "Language",
+    Description = "Interface language",
+    Options = {"English", "Spanish", "French", "German", "Japanese"},
+    Default = "English",
+    Callback = function(selected)
+        print("Language:", selected);
+    end
+});
+
+-- // Gameplay Settings
+Components:AddToggle(gameplaybox, {
+    Name = "Auto Save",
+    Description = "Automatically save progress",
+    Default = true,
     Callback = function(value)
-        currentTheme = value;
-        print("Theme changed to:", value);
-        -- Note: Theme changing would require reloading the UI
-    end,
-    Separator = true
+        print("Auto Save:", value);
+    end
 });
 
-Components:AddLabel(themeBox, {
-    Text = "Available Themes:",
-    Size = 14,
-    Separator = true
+Components:AddInput(gameplaybox, {
+    Name = "Save Interval",
+    Description = "Minutes between auto saves",
+    Placeholder = "5",
+    Default = "5",
+    Separator = true,
+    Callback = function(text)
+        print("Save interval:", text, "minutes");
+    end
 });
-
-for _, themeName in ipairs(Themes:GetThemeNames()) do
-    Components:AddLabel(themeBox, {
-        Text = "• " .. themeName,
-        Size = 12
-    });
-end;
 
 -- // Keybinds Tab
-local keybindsbox = keybindstab:CreateBox({
-    Name = "Configure your keybinds:",
+local keybindbox = keybindstab:CreateBox({
+    Name = "Key Bindings",
     Column = "left",
     Height = 400
 });
 
-local speedbox = keybindstab:CreateBox({
-    Name = "Speed Toggle",
+local macrobox = keybindstab:CreateBox({
+    Name = "Macros",
     Column = "right",
-    Height = 150
+    Height = 300
 });
 
--- // Keybind Examples with "Press Key..." functionality
-KeybindComponent:AddKeybind(keybindsbox, {
-    Name = "Toggle Menu",
-    Description = "Show/hide the UI",
-    Default = Enum.KeyCode.Insert,
+-- // Key Bindings using KeybindComponent
+KeybindComponent:AddKeybind(keybindbox, {
+    Name = "Toggle ESP",
+    Description = "Show/hide enemy ESP",
+    DefaultKey = "E",
     Callback = function(key)
-        print("Toggle Menu key set to:", key.Name);
-    end,
-    Separator = true
+        print("ESP keybind set to:", key);
+    end
 });
 
-KeybindComponent:AddKeybind(keybindsbox, {
-    Name = "Speed Toggle",
-    Description = "Toggle speed hack",
-    Default = Enum.KeyCode.LeftShift,
-    Callback = function(key)
-        print("Speed Toggle key set to:", key.Name);
-    end,
-    Separator = true
-});
-
-KeybindComponent:AddKeybind(keybindsbox, {
+KeybindComponent:AddKeybind(keybindbox, {
     Name = "Auto Attack",
-    Description = "Toggle auto attack",
-    Default = Enum.KeyCode.F,
+    Description = "Toggle automatic attacking",
+    DefaultKey = "F",
+    Separator = true,
     Callback = function(key)
-        print("Auto Attack key set to:", key.Name);
-    end,
-    Separator = true
-});
-
-KeybindComponent:AddKeybind(keybindsbox, {
-    Name = "ESP Toggle",
-    Description = "Toggle ESP visibility",
-    Default = Enum.KeyCode.V,
-    Callback = function(key)
-        print("ESP Toggle key set to:", key.Name);
+        print("Auto Attack keybind set to:", key);
     end
 });
 
--- // Speed Settings
-Components:AddToggle(speedbox, {
-    Name = "Speed Enabled",
-    Description = "Enable speed modifications",
-    Default = false, -- Grey text when disabled
-    Callback = function(value)
-        print("Speed Enabled:", value);
-    end,
-    Separator = true
-});
-
-Components:AddSlider(speedbox, {
-    Name = "Speed Value",
-    Description = "Speed multiplier",
-    Min = 1,
-    Max = 20,
-    Default = 5,
-    Increment = 1,
-    Callback = function(value)
-        print("Speed Value:", value);
+KeybindComponent:AddKeybind(keybindbox, {
+    Name = "Speed Boost",
+    Description = "Activate speed boost",
+    DefaultKey = "LeftShift",
+    Callback = function(key)
+        print("Speed Boost keybind set to:", key);
     end
 });
 
-print("Pink UI v2.0 Fixed loaded successfully!");
-print("All features working:");
-print("✓ Keybind system with 'Press Key...' functionality");
-print("✓ Toggle text turns grey when disabled, white when enabled");
-print("✓ Fixed dropdown expansion in content areas");
-print("✓ Fixed scrolling GUI cutoff issues");
-print("✓ 8 different color themes available");
-print("✓ All component methods (AddSlider, AddToggle, etc.) working");
-print("✓ Improved box system with better organization");
+-- // Macros
+Components:AddButton(macrobox, {
+    Name = "Record Macro",
+    Description = "Start recording a new macro",
+    Callback = function()
+        print("Started recording macro");
+    end
+});
+
+Components:AddDropdown(macrobox, {
+    Name = "Saved Macros",
+    Description = "Select a saved macro to execute",
+    Options = {"Combat Combo", "Farm Route", "Quick Heal"},
+    Default = "Combat Combo",
+    Separator = true,
+    Callback = function(selected)
+        print("Selected macro:", selected);
+    end
+});
+
+Components:AddButton(macrobox, {
+    Name = "Execute Macro",
+    Description = "Run the selected macro",
+    Callback = function()
+        print("Executing macro");
+    end
+});
+
+-- // Add some separators for organization
+Components:AddSeparator(keybindbox, {
+    Height = 25,
+    Color = Color3.fromRGB(255, 105, 180),
+    Transparency = 0.3
+});
+
+Components:AddLabel(keybindbox, {
+    Text = "Advanced Keybinds",
+    Size = 16,
+    Color = Color3.fromRGB(255, 150, 200)
+});
+
+KeybindComponent:AddKeybind(keybindbox, {
+    Name = "Emergency Stop",
+    Description = "Stop all automated functions",
+    DefaultKey = "X",
+    Callback = function(key)
+        print("Emergency Stop keybind set to:", key);
+    end
+});
+
+print("Pink UI Library loaded successfully!");
+print("- Dropdown positioning fixed");
+print("- Theme switching enabled");
+print("- All components working");
+print("- Keybind system active");
