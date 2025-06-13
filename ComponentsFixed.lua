@@ -18,11 +18,57 @@ local clrs = {
     toggleoff = Color3.fromRGB(80, 80, 85)
 };
 
--- // theme application function
+-- // store all UI elements for theme updates
+local uiElements = {
+    backgrounds = {},
+    accents = {},
+    pinks = {},
+    secondaries = {},
+    separators = {}
+};
+
+-- // FIXED theme application function
 function components:ApplyTheme(newTheme)
+    -- Update color table
     for key, value in pairs(newTheme) do
         clrs[key] = value;
     end;
+    
+    -- Update all existing UI elements
+    for _, element in pairs(uiElements.backgrounds) do
+        if element and element.Parent then
+            element.BackgroundColor3 = clrs.bg;
+        end;
+    end;
+    
+    for _, element in pairs(uiElements.accents) do
+        if element and element.Parent then
+            element.BackgroundColor3 = clrs.accent;
+        end;
+    end;
+    
+    for _, element in pairs(uiElements.pinks) do
+        if element and element.Parent then
+            element.BackgroundColor3 = clrs.pink;
+        end;
+    end;
+    
+    for _, element in pairs(uiElements.secondaries) do
+        if element and element.Parent then
+            element.BackgroundColor3 = clrs.secondary;
+        end;
+    end;
+    
+    for _, element in pairs(uiElements.separators) do
+        if element and element.Parent then
+            element.BackgroundColor3 = clrs.separator;
+        end;
+    end;
+end;
+
+-- // helper function to register UI elements
+local function registerElement(element, category)
+    table.insert(uiElements[category], element);
 end;
 
 -- // tween configs
@@ -58,6 +104,8 @@ function components:AddSeparator(parent, cfg)
     sepline.BackgroundTransparency = transparency;
     sepline.BorderSizePixel = 0;
     sepline.Parent = sepframe;
+    
+    registerElement(sepline, "separators");
     
     local sepcorner = Instance.new("UICorner");
     sepcorner.CornerRadius = UDim.new(0, 1);
@@ -117,6 +165,8 @@ function components:AddToggle(parent, cfg)
     togglebtn.BorderSizePixel = 0;
     togglebtn.Text = "";
     togglebtn.Parent = toggleframe;
+    
+    registerElement(togglebtn, default and "pinks" or "accents");
     
     local togglecorner = Instance.new("UICorner");
     togglecorner.CornerRadius = UDim.new(0, 11);
@@ -202,6 +252,8 @@ function components:AddButton(parent, cfg)
     btn.TextSize = 14;
     btn.Font = Enum.Font.GothamMedium;
     btn.Parent = btnframe;
+    
+    registerElement(btn, "accents");
     
     local btncorner = Instance.new("UICorner");
     btncorner.CornerRadius = UDim.new(0, 8);
@@ -330,6 +382,8 @@ function components:AddSlider(parent, cfg)
     slidertrack.BorderSizePixel = 0;
     slidertrack.Parent = sliderframe;
     
+    registerElement(slidertrack, "accents");
+    
     local trackcorner = Instance.new("UICorner");
     trackcorner.CornerRadius = UDim.new(0, 3);
     trackcorner.Parent = slidertrack;
@@ -341,6 +395,8 @@ function components:AddSlider(parent, cfg)
     sliderfill.BackgroundColor3 = clrs.pink;
     sliderfill.BorderSizePixel = 0;
     sliderfill.Parent = slidertrack;
+    
+    registerElement(sliderfill, "pinks");
     
     local fillcorner = Instance.new("UICorner");
     fillcorner.CornerRadius = UDim.new(0, 3);
@@ -471,6 +527,8 @@ function components:AddInput(parent, cfg)
     inputbox.ClearTextOnFocus = false;
     inputbox.Parent = inputframe;
     
+    registerElement(inputbox, "accents");
+    
     local inputcorner = Instance.new("UICorner");
     inputcorner.CornerRadius = UDim.new(0, 6);
     inputcorner.Parent = inputbox;
@@ -556,6 +614,8 @@ function components:AddDropdown(parent, cfg)
     dropbtn.Text = "";
     dropbtn.Parent = dropframe;
     
+    registerElement(dropbtn, "accents");
+    
     local dropcorner = Instance.new("UICorner");
     dropcorner.CornerRadius = UDim.new(0, 6);
     dropcorner.Parent = dropbtn;
@@ -583,30 +643,17 @@ function components:AddDropdown(parent, cfg)
     arrow.Font = Enum.Font.Gotham;
     arrow.Parent = dropbtn;
     
-    -- // Find the main UI container for proper positioning
-    local function findMainContainer()
-        local current = parent;
-        while current and current.Parent do
-            if current.Name == "PinkUI" or current:FindFirstChild("Main") then
-                return current;
-            end;
-            current = current.Parent;
-        end;
-        return game:GetService("CoreGui");
-    end;
-    
-    local mainContainer = findMainContainer();
-    
-    -- // FIXED: Create dropdown list as screen overlay
+    -- // FIXED: Create dropdown list positioned below button
     local droplist = Instance.new("Frame");
-    droplist.Size = UDim2.new(0, 0, 0, 0); -- Start with 0 size
-    droplist.Position = UDim2.new(0, 0, 0, 0); -- Will be calculated dynamically
+    droplist.Size = UDim2.new(0, 0, 0, 0);
     droplist.BackgroundColor3 = clrs.secondary;
     droplist.BorderSizePixel = 0;
     droplist.Visible = false;
-    droplist.ZIndex = 1000; -- Very high ZIndex
+    droplist.ZIndex = 1000;
     droplist.ClipsDescendants = true;
-    droplist.Parent = mainContainer;
+    droplist.Parent = game:GetService("CoreGui");
+    
+    registerElement(droplist, "secondaries");
     
     local listcorner = Instance.new("UICorner");
     listcorner.CornerRadius = UDim.new(0, 6);
@@ -641,29 +688,26 @@ function components:AddDropdown(parent, cfg)
     local isopen = false;
     local maxHeight = math.min(#options * 30, 150);
     
-    -- // Function to position dropdown list
+    -- // FIXED: Position dropdown below button
     local function positionDropdown()
         local btnPos = dropbtn.AbsolutePosition;
         local btnSize = dropbtn.AbsoluteSize;
         local screenSize = workspace.CurrentCamera.ViewportSize;
         
-        -- Calculate position relative to screen
         local xPos = btnPos.X;
-        local yPos = btnPos.Y + btnSize.Y + 5;
+        local yPos = btnPos.Y + btnSize.Y + 2; -- Position directly below
         
-        -- Check if dropdown would go off screen bottom
+        -- Check bounds
         if yPos + maxHeight > screenSize.Y then
-            -- Position above the button instead
-            yPos = btnPos.Y - maxHeight - 5;
+            yPos = btnPos.Y - maxHeight - 2; -- Position above if no room below
         end;
         
-        -- Check if dropdown would go off screen right
         if xPos + btnSize.X > screenSize.X then
             xPos = screenSize.X - btnSize.X;
         end;
         
         droplist.Position = UDim2.new(0, xPos, 0, yPos);
-        droplist.Size = UDim2.new(0, btnSize.X, 0, 0); -- Start with 0 height for animation
+        droplist.Size = UDim2.new(0, btnSize.X, 0, 0);
     end;
     
     -- // create option buttons
@@ -743,7 +787,6 @@ function components:AddDropdown(parent, cfg)
             local listPos = droplist.AbsolutePosition;
             local listSize = droplist.AbsoluteSize;
             
-            -- Check if click is outside both button and dropdown
             local outsideBtn = mousePos.X < btnPos.X or mousePos.X > btnPos.X + btnSize.X or 
                               mousePos.Y < btnPos.Y or mousePos.Y > btnPos.Y + btnSize.Y;
             local outsideList = mousePos.X < listPos.X or mousePos.X > listPos.X + listSize.X or 
@@ -770,7 +813,6 @@ function components:AddDropdown(parent, cfg)
                 selected = option;
                 selectedlbl.Text = option;
                 
-                -- // update visual selection
                 for _, btn in ipairs(scrollframe:GetChildren()) do
                     if btn:IsA("TextButton") then
                         if btn.Text == option then
@@ -789,14 +831,12 @@ function components:AddDropdown(parent, cfg)
             options = newoptions;
             maxHeight = math.min(#options * 30, 150);
             
-            -- // clear existing options
             for _, child in ipairs(scrollframe:GetChildren()) do
                 if child:IsA("TextButton") then
                     child:Destroy();
                 end;
             end;
             
-            -- // create new options
             for i, option in ipairs(options) do
                 local optionbtn = Instance.new("TextButton");
                 optionbtn.Size = UDim2.new(1, 0, 0, 30);
@@ -823,7 +863,6 @@ function components:AddDropdown(parent, cfg)
                 end);
                 
                 optionbtn.MouseButton1Click:Connect(function()
-                    -- // update selection
                     for _, btn in ipairs(scrollframe:GetChildren()) do
                         if btn:IsA("TextButton") then
                             if btn.Text == option then
@@ -837,7 +876,6 @@ function components:AddDropdown(parent, cfg)
                     selected = option;
                     selectedlbl.Text = option;
                     
-                    -- // close dropdown
                     isopen = false;
                     createtween(droplist, twinfo.fast, {Size = UDim2.new(0, droplist.Size.X.Offset, 0, 0)}):Play();
                     createtween(arrow, twinfo.fast, {Rotation = 0}):Play();
