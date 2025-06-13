@@ -555,3 +555,102 @@ function components:AddSlider(parent, cfg)
         end
     };
 end;
+
+function components:AddInput(parent, cfg)
+    local cfg = cfg or {};
+    local name = cfg.Name or "Input";
+    local desc = cfg.Description or "";
+    local placeholder = cfg.Placeholder or "Enter text...";
+    local default = cfg.Default or "";
+    local callback = cfg.Callback or function() end;
+    local separator = cfg.Separator;
+    
+    local inputframe = Instance.new("Frame");
+    inputframe.Name = name;
+    inputframe.Size = UDim2.new(1, 0, 0, desc ~= "" and 75 or 55);
+    inputframe.BackgroundTransparency = 1;
+    inputframe.BorderSizePixel = 0;
+    inputframe.LayoutOrder = #parent:GetChildren();
+    inputframe.Parent = parent;
+    
+    -- // input label
+    local inputlbl = Instance.new("TextLabel");
+    inputlbl.Size = UDim2.new(1, 0, 0, 20);
+    inputlbl.Position = UDim2.new(0, 0, 0, 5);
+    inputlbl.BackgroundTransparency = 1;
+    inputlbl.Text = name;
+    inputlbl.TextColor3 = clrs.white;
+    inputlbl.TextSize = 14;
+    inputlbl.Font = Enum.Font.GothamMedium;
+    inputlbl.TextXAlignment = Enum.TextXAlignment.Left;
+    inputlbl.Parent = inputframe;
+    
+    registerElement(inputlbl, "texts", "white");
+    
+    -- // description
+    if desc ~= "" then
+        local desclbl = Instance.new("TextLabel");
+        desclbl.Size = UDim2.new(1, 0, 0, 15);
+        desclbl.Position = UDim2.new(0, 0, 0, 25);
+        desclbl.BackgroundTransparency = 1;
+        desclbl.Text = desc;
+        desclbl.TextColor3 = clrs.grey;
+        desclbl.TextSize = 12;
+        desclbl.Font = Enum.Font.Gotham;
+        desclbl.TextXAlignment = Enum.TextXAlignment.Left;
+        desclbl.Parent = inputframe;
+        
+        registerElement(desclbl, "texts", "grey");
+    end;
+    
+    -- // input box
+    local inputbox = Instance.new("TextBox");
+    inputbox.Size = UDim2.new(1, 0, 0, 30);
+    inputbox.Position = UDim2.new(0, 0, 1, desc ~= "" and -35 or -30);
+    inputbox.BackgroundColor3 = clrs.accent;
+    inputbox.BorderSizePixel = 0;
+    inputbox.Text = default;
+    inputbox.PlaceholderText = placeholder;
+    inputbox.TextColor3 = clrs.white;
+    inputbox.PlaceholderColor3 = clrs.grey;
+    inputbox.TextSize = 13;
+    inputbox.Font = Enum.Font.Gotham;
+    inputbox.TextXAlignment = Enum.TextXAlignment.Left;
+    inputbox.ClearTextOnFocus = false;
+    inputbox.Parent = inputframe;
+    
+    registerElement(inputbox, "accents");
+    registerElement(inputbox, "texts", "white");
+    
+    local inputcorner = Instance.new("UICorner");
+    inputcorner.CornerRadius = UDim.new(0, 6);
+    inputcorner.Parent = inputbox;
+    
+    local inputpad = Instance.new("UIPadding");
+    inputpad.PaddingLeft = UDim.new(0, 12);
+    inputpad.PaddingRight = UDim.new(0, 12);
+    inputpad.Parent = inputbox;
+    
+    inputbox.Focused:Connect(function()
+        createtween(inputbox, twinfo.fast, {BackgroundColor3 = clrs.secondary}):Play();
+    end);
+    
+    inputbox.FocusLost:Connect(function()
+        createtween(inputbox, twinfo.fast, {BackgroundColor3 = clrs.accent}):Play();
+        callback(inputbox.Text);
+    end);
+    
+    -- // add separator if requested
+    if separator then
+        self:AddSeparator(parent, separator == true and {} or separator);
+    end;
+    
+    return {
+        SetValue = function(text)
+            inputbox.Text = text;
+        end,
+        GetValue = function()
+            return inputbox.Text;
+        end
+    };
+end;
