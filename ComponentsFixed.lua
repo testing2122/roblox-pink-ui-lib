@@ -304,3 +304,97 @@ function components:AddToggle(parent, cfg)
         end
     };
 end;
+
+function components:AddButton(parent, cfg)
+    local cfg = cfg or {};
+    local name = cfg.Name or "Button";
+    local desc = cfg.Description or "";
+    local callback = cfg.Callback or function() end;
+    local separator = cfg.Separator;
+    
+    local btnframe = Instance.new("Frame");
+    btnframe.Name = name;
+    btnframe.Size = UDim2.new(1, 0, 0, desc ~= "" and 65 or 45);
+    btnframe.BackgroundTransparency = 1;
+    btnframe.BorderSizePixel = 0;
+    btnframe.LayoutOrder = #parent:GetChildren();
+    btnframe.Parent = parent;
+    
+    -- // button
+    local btn = Instance.new("TextButton");
+    btn.Size = UDim2.new(1, 0, 0, 35);
+    btn.Position = UDim2.new(0, 0, 0, desc ~= "" and 25 or 5);
+    btn.BackgroundColor3 = clrs.accent;
+    btn.BorderSizePixel = 0;
+    btn.Text = name;
+    btn.TextColor3 = clrs.white;
+    btn.TextSize = 14;
+    btn.Font = Enum.Font.GothamMedium;
+    btn.Parent = btnframe;
+    
+    registerElement(btn, "accents");
+    registerElement(btn, "texts", "white");
+    
+    local btncorner = Instance.new("UICorner");
+    btncorner.CornerRadius = UDim.new(0, 8);
+    btncorner.Parent = btn;
+    
+    -- // description
+    if desc ~= "" then
+        local desclbl = Instance.new("TextLabel");
+        desclbl.Size = UDim2.new(1, 0, 0, 15);
+        desclbl.Position = UDim2.new(0, 0, 0, 5);
+        desclbl.BackgroundTransparency = 1;
+        desclbl.Text = desc;
+        desclbl.TextColor3 = clrs.grey;
+        desclbl.TextSize = 12;
+        desclbl.Font = Enum.Font.Gotham;
+        desclbl.TextXAlignment = Enum.TextXAlignment.Left;
+        desclbl.Parent = btnframe;
+        
+        registerElement(desclbl, "texts", "grey");
+    end;
+    
+    -- // button states
+    local ishovered = false;
+    local ispressed = false;
+    
+    btn.MouseEnter:Connect(function()
+        ishovered = true;
+        if not ispressed then
+            createtween(btn, twinfo.fast, {BackgroundColor3 = clrs.pink, TextColor3 = clrs.white}):Play();
+        end;
+    end);
+    
+    btn.MouseLeave:Connect(function()
+        ishovered = false;
+        if not ispressed then
+            createtween(btn, twinfo.fast, {BackgroundColor3 = clrs.accent, TextColor3 = clrs.white}):Play();
+        end;
+    end);
+    
+    btn.MouseButton1Down:Connect(function()
+        ispressed = true;
+        createtween(btn, twinfo.fast, {BackgroundColor3 = clrs.darkpink}):Play();
+    end);
+    
+    btn.MouseButton1Up:Connect(function()
+        ispressed = false;
+        if ishovered then
+            createtween(btn, twinfo.fast, {BackgroundColor3 = clrs.pink}):Play();
+        else
+            createtween(btn, twinfo.fast, {BackgroundColor3 = clrs.accent}):Play();
+        end;
+    end);
+    
+    btn.MouseButton1Click:Connect(function()
+        callback();
+    end);
+    
+    -- // add separator if requested
+    if separator then
+        self:AddSeparator(parent, separator == true and {} or separator);
+    end;
+    
+    return btn;
+end;
