@@ -18,6 +18,13 @@ local clrs = {
     toggleoff = Color3.fromRGB(80, 80, 85)
 };
 
+-- // theme application function
+function components:ApplyTheme(newTheme)
+    for key, value in pairs(newTheme) do
+        clrs[key] = value;
+    end;
+end;
+
 -- // tween configs
 local twinfo = {
     fast = TweenInfo.new(0.25, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
@@ -576,16 +583,30 @@ function components:AddDropdown(parent, cfg)
     arrow.Font = Enum.Font.Gotham;
     arrow.Parent = dropbtn;
     
-    -- // FIXED: Create dropdown list as overlay without affecting layout
+    -- // Find the main UI container for proper positioning
+    local function findMainContainer()
+        local current = parent;
+        while current and current.Parent do
+            if current.Name == "PinkUI" or current:FindFirstChild("Main") then
+                return current;
+            end;
+            current = current.Parent;
+        end;
+        return game:GetService("CoreGui");
+    end;
+    
+    local mainContainer = findMainContainer();
+    
+    -- // FIXED: Create dropdown list as screen overlay
     local droplist = Instance.new("Frame");
-    droplist.Size = UDim2.new(1, 0, 0, 0); -- Start with 0 height
-    droplist.Position = UDim2.new(0, 0, 1, 5);
+    droplist.Size = UDim2.new(0, 0, 0, 0); -- Start with 0 size
+    droplist.Position = UDim2.new(0, 0, 0, 0); -- Will be calculated dynamically
     droplist.BackgroundColor3 = clrs.secondary;
     droplist.BorderSizePixel = 0;
     droplist.Visible = false;
-    droplist.ZIndex = 100; -- High ZIndex to appear above other elements
-    droplist.ClipsDescendants = true; -- Clip content when animating
-    droplist.Parent = dropbtn;
+    droplist.ZIndex = 1000; -- Very high ZIndex
+    droplist.ClipsDescendants = true;
+    droplist.Parent = mainContainer;
     
     local listcorner = Instance.new("UICorner");
     listcorner.CornerRadius = UDim.new(0, 6);
@@ -619,6 +640,31 @@ function components:AddDropdown(parent, cfg)
     local selected = default;
     local isopen = false;
     local maxHeight = math.min(#options * 30, 150);
+    
+    -- // Function to position dropdown list
+    local function positionDropdown()
+        local btnPos = dropbtn.AbsolutePosition;
+        local btnSize = dropbtn.AbsoluteSize;
+        local screenSize = workspace.CurrentCamera.ViewportSize;
+        
+        -- Calculate position relative to screen
+        local xPos = btnPos.X;
+        local yPos = btnPos.Y + btnSize.Y + 5;
+        
+        -- Check if dropdown would go off screen bottom
+        if yPos + maxHeight > screenSize.Y then
+            -- Position above the button instead
+            yPos = btnPos.Y - maxHeight - 5;
+        end;
+        
+        -- Check if dropdown would go off screen right
+        if xPos + btnSize.X > screenSize.X then
+            xPos = screenSize.X - btnSize.X;
+        end;
+        
+        droplist.Position = UDim2.new(0, xPos, 0, yPos);
+        droplist.Size = UDim2.new(0, btnSize.X, 0, 0); -- Start with 0 height for animation
+    end;
     
     -- // create option buttons
     for i, option in ipairs(options) do
@@ -663,7 +709,7 @@ function components:AddDropdown(parent, cfg)
             
             -- // close dropdown
             isopen = false;
-            createtween(droplist, twinfo.fast, {Size = UDim2.new(1, 0, 0, 0)}):Play();
+            createtween(droplist, twinfo.fast, {Size = UDim2.new(0, droplist.Size.X.Offset, 0, 0)}):Play();
             createtween(arrow, twinfo.fast, {Rotation = 0}):Play();
             wait(0.25);
             droplist.Visible = false;
@@ -676,14 +722,40 @@ function components:AddDropdown(parent, cfg)
         isopen = not isopen;
         
         if isopen then
+            positionDropdown();
             droplist.Visible = true;
-            createtween(droplist, twinfo.fast, {Size = UDim2.new(1, 0, 0, maxHeight)}):Play();
+            createtween(droplist, twinfo.fast, {Size = UDim2.new(0, droplist.Size.X.Offset, 0, maxHeight)}):Play();
             createtween(arrow, twinfo.fast, {Rotation = 180}):Play();
         else
-            createtween(droplist, twinfo.fast, {Size = UDim2.new(1, 0, 0, 0)}):Play();
+            createtween(droplist, twinfo.fast, {Size = UDim2.new(0, droplist.Size.X.Offset, 0, 0)}):Play();
             createtween(arrow, twinfo.fast, {Rotation = 0}):Play();
             wait(0.25);
             droplist.Visible = false;
+        end;
+    end);
+    
+    -- // Close dropdown when clicking outside
+    userinput.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 and isopen then
+            local mousePos = input.Position;
+            local btnPos = dropbtn.AbsolutePosition;
+            local btnSize = dropbtn.AbsoluteSize;
+            local listPos = droplist.AbsolutePosition;
+            local listSize = droplist.AbsoluteSize;
+            
+            -- Check if click is outside both button and dropdown
+            local outsideBtn = mousePos.X < btnPos.X or mousePos.X > btnPos.X + btnSize.X or 
+                              mousePos.Y < btnPos.Y or mousePos.Y > btnPos.Y + btnSize.Y;
+            local outsideList = mousePos.X < listPos.X or mousePos.X > listPos.X + listSize.X or 
+                               mousePos.Y < listPos.Y or mousePos.Y > listPos.Y + listSize.Y;
+            
+            if outsideBtn and outsideList then
+                isopen = false;
+                createtween(droplist, twinfo.fast, {Size = UDim2.new(0, droplist.Size.X.Offset, 0, 0)}):Play();
+                createtween(arrow, twinfo.fast, {Rotation = 0}):Play();
+                wait(0.25);
+                droplist.Visible = false;
+            end;
         end;
     end);
     
@@ -767,7 +839,7 @@ function components:AddDropdown(parent, cfg)
                     
                     -- // close dropdown
                     isopen = false;
-                    createtween(droplist, twinfo.fast, {Size = UDim2.new(1, 0, 0, 0)}):Play();
+                    createtween(droplist, twinfo.fast, {Size = UDim2.new(0, droplist.Size.X.Offset, 0, 0)}):Play();
                     createtween(arrow, twinfo.fast, {Rotation = 0}):Play();
                     wait(0.25);
                     droplist.Visible = false;
