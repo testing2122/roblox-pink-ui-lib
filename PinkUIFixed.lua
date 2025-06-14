@@ -31,6 +31,7 @@ local uiElements = {
     tabButtons = {},
     tabIcons = {},
     tabLabels = {},
+    strokes = {}, -- // add strokes array for box borders
     gradientButton = nil,
     titleGradient = nil
 };
@@ -62,6 +63,13 @@ function pnkui:ApplyTheme(newTheme)
     for _, hoverline in pairs(uiElements.hoverlines) do
         if hoverline and hoverline.Parent then
             tweenserv:Create(hoverline, tweenInfo, {BackgroundColor3 = clrs.grey}):Play();
+        end;
+    end;
+    
+    -- // Update box strokes to use theme color
+    for _, stroke in pairs(uiElements.strokes) do
+        if stroke and stroke.Parent then
+            tweenserv:Create(stroke, tweenInfo, {Color = clrs.pink}):Play();
         end;
     end;
     
@@ -714,6 +722,9 @@ function pnkui:CreateWindow(cfg)
             boxstroke.Thickness = 1;
             boxstroke.Transparency = 0.6;
             boxstroke.Parent = box;
+            
+            -- // Register box stroke for theme updates
+            table.insert(uiElements.strokes, boxstroke);
             
             -- // box title - FIXED to use theme color
             local boxtitle = Instance.new("TextLabel");
