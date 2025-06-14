@@ -1,23 +1,27 @@
--- // Pink UI Library Working Example with Theme System
--- // This example works with the current ComponentsFixed.lua file
+-- // Pink UI Library Working Example with Fixed Theme System
+-- // Uses PinkUIFixed.lua with proper theme application
 
 local PinkUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/testing2122/roblox-pink-ui-lib/main/PinkUIFixed.lua"))();
 local Components = loadstring(game:HttpGet("https://raw.githubusercontent.com/testing2122/roblox-pink-ui-lib/main/ComponentsFixed.lua"))();
 local Themes = loadstring(game:HttpGet("https://raw.githubusercontent.com/testing2122/roblox-pink-ui-lib/main/Themes.lua"))();
 
--- // Check if Components loaded correctly
+-- // Check if libraries loaded correctly
+if not PinkUI then
+    warn("Failed to load PinkUI library!");
+    return;
+end;
+
 if not Components then
     warn("Failed to load Components library!");
     return;
 end;
 
-if not Components.ApplyTheme then
-    warn("ApplyTheme function not found in Components!");
+if not Themes then
+    warn("Failed to load Themes library!");
     return;
 end;
 
-print("Components loaded successfully!");
-print("Available functions:", table.concat({"AddToggle", "AddButton", "AddSlider", "AddInput", "AddSeparator", "ApplyTheme"}, ", "));
+print("✅ All libraries loaded successfully!");
 
 -- // Create window
 local window = PinkUI:CreateWindow({
@@ -137,7 +141,32 @@ local settingsbox = themestab:CreateBox({
     Height = 300
 });
 
--- // Theme Buttons (since dropdown isn't available yet)
+-- // Theme application function
+local function applyTheme(themeName)
+    print("🎨 Applying", themeName, "theme...");
+    local selectedTheme = Themes:GetTheme(themeName);
+    if selectedTheme then
+        -- // Apply theme using PinkUI's ApplyTheme function (not Components)
+        PinkUI:ApplyTheme(selectedTheme);
+        print("✅ Applied", themeName, "theme successfully!");
+        
+        -- // Update window subtitle to show current theme
+        local screenGui = game:GetService("CoreGui"):FindFirstChild("PinkUI");
+        if screenGui and screenGui:FindFirstChild("Main") then
+            local titlebar = screenGui.Main:FindFirstChild("TitleBar");
+            if titlebar and titlebar:FindFirstChild("Subtitle") then
+                titlebar.Subtitle.Text = "Current theme: " .. themeName;
+            end;
+        end;
+        
+        return true;
+    else
+        warn("❌ Theme", themeName, "not found!");
+        return false;
+    end;
+end;
+
+-- // Theme Buttons with proper theme application
 local availableThemes = {"Pink", "Blue", "Purple", "Green", "Orange", "Red", "Dark", "Cyan"};
 
 for i, themeName in ipairs(availableThemes) do
@@ -146,23 +175,7 @@ for i, themeName in ipairs(availableThemes) do
         Description = "Switch to " .. themeName:lower() .. " color scheme",
         Separator = i < #availableThemes,
         Callback = function()
-            print("Applying", themeName, "theme...");
-            local selectedTheme = Themes:GetTheme(themeName);
-            if selectedTheme then
-                Components:ApplyTheme(selectedTheme);
-                print("✅ Applied", themeName, "theme successfully!");
-                
-                -- Update window title to show current theme
-                local screenGui = game:GetService("CoreGui"):FindFirstChild("PinkUI");
-                if screenGui and screenGui:FindFirstChild("Main") then
-                    local titlebar = screenGui.Main:FindFirstChild("TitleBar");
-                    if titlebar and titlebar:FindFirstChild("Subtitle") then
-                        titlebar.Subtitle.Text = "Current theme: " .. themeName;
-                    end;
-                end;
-            else
-                warn("❌ Theme", themeName, "not found!");
-            end;
+            applyTheme(themeName);
         end
     });
 end;
@@ -210,28 +223,17 @@ Components:AddInput(settingsbox, {
     end
 });
 
--- // Add some visual feedback
-Components:AddSeparator(themebox, {
-    Height = 30,
-    Color = Color3.fromRGB(255, 105, 180),
-    Transparency = 0.3
-});
-
 print("🎨 Pink UI Library loaded successfully!");
-print("✨ Theme system is working!");
+print("✨ Theme system is working with proper registration!");
 print("🔄 Click any theme button to see smooth color transitions!");
 print("📱 Available themes:", table.concat(availableThemes, ", "));
+print("🎯 Section borders, tab colors, and text will now change properly!");
 
--- // Auto-apply a random theme after 3 seconds for demo
+-- // Auto-apply blue theme after 2 seconds for demo
 spawn(function()
-    wait(3);
-    local randomTheme = availableThemes[math.random(1, #availableThemes)];
-    if randomTheme ~= "Pink" then -- Don't change if already pink
-        print("🎲 Auto-applying", randomTheme, "theme for demo...");
-        local theme = Themes:GetTheme(randomTheme);
-        if theme then
-            Components:ApplyTheme(theme);
-            print("🌈 Demo theme applied! Try the other theme buttons!");
-        end;
-    end;
+    wait(2);
+    print("🎲 Auto-applying Blue theme for demo...");
+    applyTheme("Blue");
+    print("🌈 Blue theme applied! Section borders and tab colors should now be blue!");
+    print("💡 Try clicking other theme buttons to see the changes!");
 end);
