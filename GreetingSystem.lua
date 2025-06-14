@@ -1,205 +1,110 @@
--- // Pink UI Greeting System Component
 local GreetingSystem = {};
-local tweenserv = game:GetService("TweenService");
-local runserv = game:GetService("RunService");
-local players = game:GetService("Players");
+local plrs = game:GetService("Players");
+local ts = game:GetService("TweenService");
+local rs = game:GetService("RunService");
 
-local plr = players.LocalPlayer;
-
--- // Configuration for easy toggling
-GreetingSystem.Config = {
+local config = {
     freemode = true,
     premiummode = false
 };
 
--- // Rainbow colors for premium animation
+local function getTimeOfDay()
+    local hr = os.date("*t").hour;
+    if hr >= 5 and hr < 12 then
+        return "Good morning";
+    elseif hr >= 12 and hr < 18 then
+        return "Good afternoon";
+    else
+        return "Good evening";
+    end;
+end;
+
 local rainbowColors = {
-    Color3.fromRGB(255, 0, 0),     -- Red
-    Color3.fromRGB(255, 127, 0),   -- Orange
-    Color3.fromRGB(255, 255, 0),   -- Yellow
-    Color3.fromRGB(0, 255, 0),     -- Green
-    Color3.fromRGB(0, 0, 255),     -- Blue
-    Color3.fromRGB(75, 0, 130),    -- Indigo
-    Color3.fromRGB(148, 0, 211),   -- Violet
+    Color3.fromRGB(255, 0, 0),    -- Red
+    Color3.fromRGB(255, 127, 0),  -- Orange
+    Color3.fromRGB(255, 255, 0),  -- Yellow
+    Color3.fromRGB(0, 255, 0),    -- Green
+    Color3.fromRGB(0, 0, 255),    -- Blue
+    Color3.fromRGB(75, 0, 130),   -- Indigo
+    Color3.fromRGB(148, 0, 211)   -- Violet
 };
 
--- // Get time-based greeting
-local function getGreeting()
-    local currentTime = os.date("*t");
-    local hour = currentTime.hour;
+local function createRainbowEffect(textLabel)
+    local i = 1;
+    local conn;
     
-    if hour >= 5 and hour < 12 then
-        return "Good Morning";
-    elseif hour >= 12 and hour < 17 then
-        return "Good Afternoon";
-    elseif hour >= 17 and hour < 21 then
-        return "Good Evening";
-    else
-        return "Good Night";
-    end;
+    conn = rs.Heartbeat:Connect(function()
+        if not textLabel or not textLabel.Parent then
+            conn:Disconnect();
+            return;
+        end;
+        
+        local goal = {TextColor3 = rainbowColors[i]};
+        local tween = ts:Create(textLabel, TweenInfo.new(0.5), goal);
+        tween:Play();
+        
+        i = i + 1;
+        if i > #rainbowColors then i = 1 end;
+    end);
 end;
 
--- // Create greeting display
-function GreetingSystem:CreateGreeting(parent, colors)
-    local clrs = colors or {
-        pink = Color3.fromRGB(255, 105, 180),
-        white = Color3.fromRGB(255, 255, 255),
-        grey = Color3.fromRGB(120, 120, 125),
-        secondary = Color3.fromRGB(12, 12, 15),
-        green = Color3.fromRGB(0, 255, 100)
-    };
-    
-    -- // Main greeting container
+function GreetingSystem:CreateGreeting(frame)
     local greetingFrame = Instance.new("Frame");
-    greetingFrame.Name = "GreetingContainer";
-    greetingFrame.Size = UDim2.new(0, 320, 0, 80);
-    greetingFrame.Position = UDim2.new(0, 15, 1, -95);
-    greetingFrame.BackgroundColor3 = clrs.secondary;
-    greetingFrame.BackgroundTransparency = 0.1;
-    greetingFrame.BorderSizePixel = 0;
-    greetingFrame.Parent = parent;
+    greetingFrame.Size = UDim2.new(1, 0, 0, 50);
+    greetingFrame.Position = UDim2.new(0, 0, 1, -50);
+    greetingFrame.BackgroundTransparency = 1;
+    greetingFrame.Parent = frame;
     
-    local greetingCorner = Instance.new("UICorner");
-    greetingCorner.CornerRadius = UDim.new(0, 12);
-    greetingCorner.Parent = greetingFrame;
-    
-    local greetingStroke = Instance.new("UIStroke");
-    greetingStroke.Color = clrs.pink;
-    greetingStroke.Thickness = 1;
-    greetingStroke.Transparency = 0.6;
-    greetingStroke.Parent = greetingFrame;
-    
-    -- // Avatar image
-    local avatarFrame = Instance.new("Frame");
-    avatarFrame.Size = UDim2.new(0, 50, 0, 50);
-    avatarFrame.Position = UDim2.new(0, 15, 0.5, -25);
-    avatarFrame.BackgroundColor3 = clrs.secondary;
-    avatarFrame.BorderSizePixel = 0;
+    local avatarFrame = Instance.new("ImageLabel");
+    avatarFrame.Size = UDim2.new(0, 40, 0, 40);
+    avatarFrame.Position = UDim2.new(0, 5, 0, 5);
+    avatarFrame.BackgroundTransparency = 1;
     avatarFrame.Parent = greetingFrame;
     
-    local avatarCorner = Instance.new("UICorner");
-    avatarCorner.CornerRadius = UDim.new(0, 25);
-    avatarCorner.Parent = avatarFrame;
-    
-    local avatarImage = Instance.new("ImageLabel");
-    avatarImage.Size = UDim2.new(1, 0, 1, 0);
-    avatarImage.Position = UDim2.new(0, 0, 0, 0);
-    avatarImage.BackgroundTransparency = 1;
-    avatarImage.Image = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. plr.UserId .. "&width=150&height=150&format=png";
-    avatarImage.Parent = avatarFrame;
-    
-    local avatarImageCorner = Instance.new("UICorner");
-    avatarImageCorner.CornerRadius = UDim.new(0, 25);
-    avatarImageCorner.Parent = avatarImage;
-    
-    -- // Greeting text
     local greetingText = Instance.new("TextLabel");
-    greetingText.Size = UDim2.new(1, -80, 0, 25);
-    greetingText.Position = UDim2.new(0, 75, 0, 8);
+    greetingText.Size = UDim2.new(1, -55, 1, 0);
+    greetingText.Position = UDim2.new(0, 50, 0, 0);
     greetingText.BackgroundTransparency = 1;
-    greetingText.Text = getGreeting() .. ", " .. plr.DisplayName;
-    greetingText.TextColor3 = clrs.white;
-    greetingText.TextSize = 16;
-    greetingText.Font = Enum.Font.GothamBold;
     greetingText.TextXAlignment = Enum.TextXAlignment.Left;
+    greetingText.TextSize = 14;
+    greetingText.Font = Enum.Font.GothamBold;
     greetingText.Parent = greetingFrame;
     
-    -- // Status text (Premium/Free)
-    local statusText = Instance.new("TextLabel");
-    statusText.Size = UDim2.new(1, -80, 0, 20);
-    statusText.Position = UDim2.new(0, 75, 0, 35);
-    statusText.BackgroundTransparency = 1;
-    statusText.TextSize = 14;
-    statusText.Font = Enum.Font.Gotham;
-    statusText.TextXAlignment = Enum.TextXAlignment.Left;
-    statusText.Parent = greetingFrame;
-    
-    -- // Update status display
-    local function updateStatus()
-        if GreetingSystem.Config.premiummode then
-            statusText.Text = "Premium User";
-            -- Start rainbow animation
-            spawn(function()
-                local colorIndex = 1;
-                while GreetingSystem.Config.premiummode and statusText.Parent do
-                    statusText.TextColor3 = rainbowColors[colorIndex];
-                    colorIndex = colorIndex + 1;
-                    if colorIndex > #rainbowColors then
-                        colorIndex = 1;
-                    end;
-                    wait(0.3);
-                end;
-            end);
+    local function updateGreeting()
+        local plr = plrs.LocalPlayer;
+        if not plr then return end;
+        
+        -- Update avatar
+        local userId = plr.UserId;
+        local thumbType = Enum.ThumbnailType.HeadShot;
+        local thumbSize = Enum.ThumbnailSize.Size48x48;
+        local content = plrs:GetUserThumbnailAsync(userId, thumbType, thumbSize);
+        avatarFrame.Image = content;
+        
+        -- Update greeting text
+        local greeting = getTimeOfDay();
+        local userType = config.premiummode and "[Premium]" or "[Free]";
+        greetingText.Text = string.format("%s, %s %s", greeting, plr.Name, userType);
+        
+        -- Apply color effects
+        if config.premiummode then
+            createRainbowEffect(greetingText);
         else
-            statusText.Text = "Free User";
-            statusText.TextColor3 = clrs.green;
+            greetingText.TextColor3 = Color3.fromRGB(0, 255, 0);
         end;
     end;
     
-    -- // Initial status update
-    updateStatus();
-    
-    -- // Update greeting every minute
-    spawn(function()
-        while greetingFrame.Parent do
-            wait(60);
-            if greetingText.Parent then
-                greetingText.Text = getGreeting() .. ", " .. plr.DisplayName;
-            end;
-        end;
-    end);
-    
-    -- // Store references for theme updates
-    local greetingElements = {
-        frame = greetingFrame,
-        stroke = greetingStroke,
-        greetingText = greetingText,
-        statusText = statusText,
-        avatarFrame = avatarFrame
-    };
-    
-    -- // Toggle functions
-    function GreetingSystem:TogglePremium()
-        GreetingSystem.Config.premiummode = true;
-        GreetingSystem.Config.freemode = false;
-        updateStatus();
-    end;
-    
-    function GreetingSystem:ToggleFree()
-        GreetingSystem.Config.freemode = true;
-        GreetingSystem.Config.premiummode = false;
-        updateStatus();
-    end;
-    
-    return greetingElements;
+    updateGreeting();
+    plrs.PlayerAdded:Connect(updateGreeting);
 end;
 
--- // Apply theme to greeting elements
-function GreetingSystem:ApplyTheme(greetingElements, newColors)
-    if not greetingElements then return; end;
-    
-    local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out);
-    
-    if greetingElements.frame then
-        tweenserv:Create(greetingElements.frame, tweenInfo, {BackgroundColor3 = newColors.secondary}):Play();
-    end;
-    
-    if greetingElements.stroke then
-        tweenserv:Create(greetingElements.stroke, tweenInfo, {Color = newColors.pink}):Play();
-    end;
-    
-    if greetingElements.greetingText then
-        tweenserv:Create(greetingElements.greetingText, tweenInfo, {TextColor3 = newColors.white}):Play();
-    end;
-    
-    if greetingElements.avatarFrame then
-        tweenserv:Create(greetingElements.avatarFrame, tweenInfo, {BackgroundColor3 = newColors.secondary}):Play();
-    end;
-    
-    -- Update status color if free mode
-    if GreetingSystem.Config.freemode and greetingElements.statusText then
-        tweenserv:Create(greetingElements.statusText, tweenInfo, {TextColor3 = newColors.green or Color3.fromRGB(0, 255, 100)}):Play();
-    end;
+function GreetingSystem:SetPremium(isPremium)
+    config.premiummode = isPremium;
+    config.freemode = not isPremium;
+end;
+
+function GreetingSystem:IsPremium()
+    return config.premiummode;
 end;
 
 return GreetingSystem;
