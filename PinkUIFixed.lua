@@ -32,6 +32,7 @@ local uiElements = {
     tabIcons = {},
     tabLabels = {},
     strokes = {}, -- // add strokes array for box borders
+    scrollbars = {}, -- // add scrollbars array for scrollbar colors
     gradientButton = nil,
     titleGradient = nil
 };
@@ -70,6 +71,13 @@ function pnkui:ApplyTheme(newTheme)
     for _, stroke in pairs(uiElements.strokes) do
         if stroke and stroke.Parent then
             tweenserv:Create(stroke, tweenInfo, {Color = clrs.pink}):Play();
+        end;
+    end;
+    
+    -- // Update scrollbars to use theme color
+    for _, scrollbar in pairs(uiElements.scrollbars) do
+        if scrollbar and scrollbar.Parent then
+            tweenserv:Create(scrollbar, tweenInfo, {ScrollBarImageColor3 = clrs.pink}):Play();
         end;
     end;
     
@@ -365,6 +373,9 @@ function pnkui:CreateWindow(cfg)
     tabcont.ScrollingDirection = Enum.ScrollingDirection.Y;
     tabcont.Parent = sidebar;
     
+    -- // Register tab container scrollbar for theme updates
+    table.insert(uiElements.scrollbars, tabcont);
+    
     local tablayout = Instance.new("UIListLayout");
     tablayout.SortOrder = Enum.SortOrder.LayoutOrder;
     tablayout.Padding = UDim.new(0, 8);
@@ -542,6 +553,9 @@ function pnkui:CreateWindow(cfg)
         tabcontent.Visible = false;
         tabcontent.Parent = content;
         
+        -- // Register tab content scrollbar for theme updates
+        table.insert(uiElements.scrollbars, tabcontent);
+        
         -- // left column
         local leftcolumn = Instance.new("ScrollingFrame");
         leftcolumn.Name = "LeftColumn";
@@ -555,6 +569,9 @@ function pnkui:CreateWindow(cfg)
         leftcolumn.CanvasSize = UDim2.new(0, 0, 0, 0);
         leftcolumn.AutomaticCanvasSize = Enum.AutomaticSize.Y;
         leftcolumn.Parent = tabcontent;
+        
+        -- // Register left column scrollbar for theme updates
+        table.insert(uiElements.scrollbars, leftcolumn);
         
         local leftlayout = Instance.new("UIListLayout");
         leftlayout.SortOrder = Enum.SortOrder.LayoutOrder;
@@ -581,6 +598,9 @@ function pnkui:CreateWindow(cfg)
         rightcolumn.CanvasSize = UDim2.new(0, 0, 0, 0);
         rightcolumn.AutomaticCanvasSize = Enum.AutomaticSize.Y;
         rightcolumn.Parent = tabcontent;
+        
+        -- // Register right column scrollbar for theme updates
+        table.insert(uiElements.scrollbars, rightcolumn);
         
         local rightlayout = Instance.new("UIListLayout");
         rightlayout.SortOrder = Enum.SortOrder.LayoutOrder;
@@ -713,6 +733,9 @@ function pnkui:CreateWindow(cfg)
             box.LayoutOrder = #targetcolumn:GetChildren();
             box.Parent = targetcolumn;
             
+            -- // Register box scrollbar for theme updates
+            table.insert(uiElements.scrollbars, box);
+            
             local boxcorner = Instance.new("UICorner");
             boxcorner.CornerRadius = UDim.new(0, 12);
             boxcorner.Parent = box;
@@ -753,6 +776,9 @@ function pnkui:CreateWindow(cfg)
             boxcontent.CanvasSize = UDim2.new(0, 0, 0, 0);
             boxcontent.AutomaticCanvasSize = Enum.AutomaticSize.Y;
             boxcontent.Parent = box;
+            
+            -- // Register box content scrollbar for theme updates
+            table.insert(uiElements.scrollbars, boxcontent);
             
             local boxlayout = Instance.new("UIListLayout");
             boxlayout.SortOrder = Enum.SortOrder.LayoutOrder;
