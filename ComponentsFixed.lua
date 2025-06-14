@@ -774,7 +774,7 @@ function components:AddDropdown(parent, cfg)
     droplist.Parent = dropbtn;
     
     registerElement(droplist, "secondaries");
-    registerElement(droplist, "scrollbars");
+    registerElement(droplist, "scrollbars"); -- // Register dropdown scrollbar for theme updates
     
     local listcorner = Instance.new("UICorner");
     listcorner.CornerRadius = UDim.new(0, 6);
