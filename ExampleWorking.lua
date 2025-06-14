@@ -1,5 +1,5 @@
 -- // Pink UI Library Working Example with Fixed Theme System
--- // Uses PinkUIFixed.lua with proper theme application
+-- // Uses both PinkUIFixed.lua and ComponentsFixed.lua with coordinated theme application
 
 local PinkUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/testing2122/roblox-pink-ui-lib/main/PinkUIFixed.lua"))();
 local Components = loadstring(game:HttpGet("https://raw.githubusercontent.com/testing2122/roblox-pink-ui-lib/main/ComponentsFixed.lua"))();
@@ -141,14 +141,16 @@ local settingsbox = themestab:CreateBox({
     Height = 300
 });
 
--- // Theme application function
+-- // FIXED: Theme application function that updates BOTH PinkUI and Components
 local function applyTheme(themeName)
     print("🎨 Applying", themeName, "theme...");
     local selectedTheme = Themes:GetTheme(themeName);
     if selectedTheme then
-        -- // Apply theme using PinkUI's ApplyTheme function (not Components)
-        PinkUI:ApplyTheme(selectedTheme);
-        print("✅ Applied", themeName, "theme successfully!");
+        -- // Apply theme to BOTH libraries
+        PinkUI:ApplyTheme(selectedTheme);  -- Updates window, tabs, box borders
+        Components:ApplyTheme(selectedTheme);  -- Updates buttons, toggles, sliders, etc.
+        
+        print("✅ Applied", themeName, "theme to both PinkUI and Components!");
         
         -- // Update window subtitle to show current theme
         local screenGui = game:GetService("CoreGui"):FindFirstChild("PinkUI");
@@ -166,7 +168,7 @@ local function applyTheme(themeName)
     end;
 end;
 
--- // Theme Buttons with proper theme application
+-- // Theme Buttons with proper coordinated theme application
 local availableThemes = {"Pink", "Blue", "Purple", "Green", "Orange", "Red", "Dark", "Cyan"};
 
 for i, themeName in ipairs(availableThemes) do
@@ -224,16 +226,17 @@ Components:AddInput(settingsbox, {
 });
 
 print("🎨 Pink UI Library loaded successfully!");
-print("✨ Theme system is working with proper registration!");
+print("✨ Theme system is working with BOTH PinkUI and Components!");
 print("🔄 Click any theme button to see smooth color transitions!");
 print("📱 Available themes:", table.concat(availableThemes, ", "));
-print("🎯 Section borders, tab colors, and text will now change properly!");
+print("🎯 Section borders, tab colors, buttons, and ALL elements will now change properly!");
 
--- // Auto-apply blue theme after 2 seconds for demo
+-- // Auto-apply cyan theme after 2 seconds for demo
 spawn(function()
     wait(2);
-    print("🎲 Auto-applying Blue theme for demo...");
-    applyTheme("Blue");
-    print("🌈 Blue theme applied! Section borders and tab colors should now be blue!");
-    print("💡 Try clicking other theme buttons to see the changes!");
+    print("🎲 Auto-applying Cyan theme for demo...");
+    applyTheme("Cyan");
+    print("🌈 Cyan theme applied to BOTH libraries!");
+    print("💡 Section borders, tab colors, and component colors should all be cyan now!");
+    print("🔧 Try clicking other theme buttons to see the coordinated changes!");
 end);
