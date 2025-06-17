@@ -34,7 +34,7 @@ local uiElements = {
     strokes = {},
     scrollbars = {},
     gradientButton = nil,
-    titleGradient = nil
+    titleGradientObj = nil
 };
 
 function pnkui:ApplyTheme(newTheme)
@@ -89,14 +89,11 @@ function pnkui:ApplyTheme(newTheme)
         tween:Play();
     end;
     
-    if uiElements.titleGradient then
-        local tween = tweenserv:Create(uiElements.titleGradient.UIGradient, tweenInfo, {
-            Color = ColorSequence.new({
-                ColorSequenceKeypoint.new(0, clrs.pink),
-                ColorSequenceKeypoint.new(1, clrs.darkpink)
-            })
+    if uiElements.titleGradientObj then
+        uiElements.titleGradientObj.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, clrs.pink),
+            ColorSequenceKeypoint.new(1, clrs.darkpink)
         });
-        tween:Play();
     end;
 end;
 
@@ -168,7 +165,7 @@ function pnkui:CreateWindow(config)
         });
         gradient.Parent = titleText;
         
-        uiElements.titleGradient = titleText;
+        uiElements.titleGradientObj = gradient;
         
         local offset = 0;
         runserv.Heartbeat:Connect(function()
@@ -202,9 +199,9 @@ function pnkui:CreateWindow(config)
     uiElements.gradientButton = gradientButton;
     
     gradientButton.MouseButton1Click:Connect(function()
-        if uiElements.titleGradient then
-            uiElements.titleGradient:Destroy();
-            uiElements.titleGradient = nil;
+        if uiElements.titleGradientObj then
+            uiElements.titleGradientObj:Destroy();
+            uiElements.titleGradientObj = nil;
         else
             local gradient = Instance.new("UIGradient");
             gradient.Color = ColorSequence.new({
@@ -213,7 +210,7 @@ function pnkui:CreateWindow(config)
             });
             gradient.Parent = titleText;
             
-            uiElements.titleGradient = titleText;
+            uiElements.titleGradientObj = gradient;
             
             local offset = 0;
             runserv.Heartbeat:Connect(function()
