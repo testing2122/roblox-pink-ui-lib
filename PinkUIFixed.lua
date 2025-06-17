@@ -78,7 +78,7 @@ function pnkui:ApplyTheme(newTheme)
     end;
     
     for _, scrollbar in pairs(uiElements.scrollbars) do
-        local tween = tweenserv:Create(scrollbar, tweenInfo, {BackgroundColor3 = clrs.pink});
+        local tween = tweenserv:Create(scrollbar, tweenInfo, {ScrollBarImageColor3 = clrs.pink});
         tween:Play();
     end;
     
@@ -105,10 +105,18 @@ function pnkui:CreateWindow(config)
     screenGui.Parent = coregui;
     
     local mainFrame = Instance.new("Frame");
-    mainFrame.Size = UDim2.new(0, 700, 0, 450);
-    mainFrame.Position = UDim2.new(0.5, -350, 0.5, -225);
+    mainFrame.Size = UDim2.new(0, 750, 0, 500);
+    mainFrame.Position = UDim2.new(0.5, -375, 0.5, -250);
     mainFrame.BackgroundColor3 = clrs.bg;
+    mainFrame.BorderSizePixel = 0;
     mainFrame.Parent = screenGui;
+    
+    local mainStroke = Instance.new("UIStroke");
+    mainStroke.Color = clrs.pink;
+    mainStroke.Thickness = 2;
+    mainStroke.Parent = mainFrame;
+    
+    table.insert(uiElements.strokes, mainStroke);
     
     local dragging = false;
     local dragStart = nil;
@@ -141,21 +149,21 @@ function pnkui:CreateWindow(config)
     end);
     
     local corner = Instance.new("UICorner");
-    corner.CornerRadius = UDim.new(0, 5);
+    corner.CornerRadius = UDim.new(0, 8);
     corner.Parent = mainFrame;
     
     local titleFrame = Instance.new("Frame");
-    titleFrame.Size = UDim2.new(1, 0, 0, 30);
+    titleFrame.Size = UDim2.new(1, 0, 0, 40);
     titleFrame.BackgroundTransparency = 1;
     titleFrame.Parent = mainFrame;
     
     local titleText = Instance.new("TextLabel");
-    titleText.Size = UDim2.new(1, -100, 1, 0);
-    titleText.Position = UDim2.new(0, 10, 0, 0);
+    titleText.Size = UDim2.new(1, -120, 1, 0);
+    titleText.Position = UDim2.new(0, 15, 0, 0);
     titleText.BackgroundTransparency = 1;
     titleText.TextXAlignment = Enum.TextXAlignment.Left;
     titleText.TextColor3 = clrs.white;
-    titleText.TextSize = 14;
+    titleText.TextSize = 16;
     titleText.Font = Enum.Font.GothamBold;
     titleText.Text = config.Title or "Pink UI";
     titleText.Parent = titleFrame;
@@ -180,7 +188,7 @@ function pnkui:CreateWindow(config)
     if config.Subtitle then
         local subtitleText = Instance.new("TextLabel");
         subtitleText.Size = UDim2.new(0, 200, 1, 0);
-        subtitleText.Position = UDim2.new(0, 120, 0, 0);
+        subtitleText.Position = UDim2.new(0, 150, 0, 0);
         subtitleText.BackgroundTransparency = 1;
         subtitleText.TextColor3 = clrs.grey;
         subtitleText.TextSize = 14;
@@ -190,11 +198,11 @@ function pnkui:CreateWindow(config)
     end;
     
     local gradientButton = Instance.new("TextButton");
-    gradientButton.Size = UDim2.new(0, 20, 0, 20);
-    gradientButton.Position = UDim2.new(1, -90, 0, 5);
+    gradientButton.Size = UDim2.new(0, 25, 0, 25);
+    gradientButton.Position = UDim2.new(1, -100, 0, 7.5);
     gradientButton.BackgroundTransparency = 1;
     gradientButton.TextColor3 = clrs.pink;
-    gradientButton.TextSize = 14;
+    gradientButton.TextSize = 16;
     gradientButton.Font = Enum.Font.GothamBold;
     gradientButton.Text = "G";
     gradientButton.Parent = titleFrame;
@@ -224,11 +232,11 @@ function pnkui:CreateWindow(config)
     end);
     
     local minimizeButton = Instance.new("TextButton");
-    minimizeButton.Size = UDim2.new(0, 20, 0, 20);
-    minimizeButton.Position = UDim2.new(1, -60, 0, 5);
+    minimizeButton.Size = UDim2.new(0, 25, 0, 25);
+    minimizeButton.Position = UDim2.new(1, -70, 0, 7.5);
     minimizeButton.BackgroundTransparency = 1;
     minimizeButton.TextColor3 = clrs.white;
-    minimizeButton.TextSize = 20;
+    minimizeButton.TextSize = 18;
     minimizeButton.Font = Enum.Font.GothamBold;
     minimizeButton.Text = "-";
     minimizeButton.Parent = titleFrame;
@@ -236,17 +244,17 @@ function pnkui:CreateWindow(config)
     local minimized = false;
     minimizeButton.MouseButton1Click:Connect(function()
         minimized = not minimized;
-        local targetSize = minimized and UDim2.new(0, 700, 0, 30) or UDim2.new(0, 700, 0, 450);
+        local targetSize = minimized and UDim2.new(0, 750, 0, 40) or UDim2.new(0, 750, 0, 500);
         local tween = tweenserv:Create(mainFrame, TweenInfo.new(0.3), {Size = targetSize});
         tween:Play();
     end);
     
     local closeButton = Instance.new("TextButton");
-    closeButton.Size = UDim2.new(0, 20, 0, 20);
-    closeButton.Position = UDim2.new(1, -30, 0, 5);
+    closeButton.Size = UDim2.new(0, 25, 0, 25);
+    closeButton.Position = UDim2.new(1, -35, 0, 7.5);
     closeButton.BackgroundTransparency = 1;
     closeButton.TextColor3 = clrs.red;
-    closeButton.TextSize = 14;
+    closeButton.TextSize = 16;
     closeButton.Font = Enum.Font.GothamBold;
     closeButton.Text = "X";
     closeButton.Parent = titleFrame;
@@ -256,46 +264,61 @@ function pnkui:CreateWindow(config)
     end);
     
     local separator = Instance.new("Frame");
-    separator.Size = UDim2.new(1, -20, 0, 1);
-    separator.Position = UDim2.new(0, 10, 0, 35);
-    separator.BackgroundColor3 = clrs.separator;
+    separator.Size = UDim2.new(1, -30, 0, 2);
+    separator.Position = UDim2.new(0, 15, 0, 45);
+    separator.BackgroundColor3 = clrs.pink;
     separator.BorderSizePixel = 0;
     separator.Parent = mainFrame;
     
+    table.insert(uiElements.underlines, separator);
+    
+    local sepCorner = Instance.new("UICorner");
+    sepCorner.CornerRadius = UDim.new(0, 1);
+    sepCorner.Parent = separator;
+    
     local tabContainer = Instance.new("ScrollingFrame");
-    tabContainer.Size = UDim2.new(0, 120, 1, -45);
-    tabContainer.Position = UDim2.new(0, 10, 0, 40);
+    tabContainer.Size = UDim2.new(0, 140, 1, -65);
+    tabContainer.Position = UDim2.new(0, 15, 0, 55);
     tabContainer.BackgroundColor3 = clrs.secondary;
     tabContainer.BorderSizePixel = 0;
-    tabContainer.ScrollBarThickness = 2;
+    tabContainer.ScrollBarThickness = 3;
     tabContainer.ScrollBarImageColor3 = clrs.pink;
     tabContainer.Parent = mainFrame;
     
     table.insert(uiElements.scrollbars, tabContainer);
     
+    local tabStroke = Instance.new("UIStroke");
+    tabStroke.Color = clrs.pink;
+    tabStroke.Thickness = 1;
+    tabStroke.Parent = tabContainer;
+    
+    table.insert(uiElements.strokes, tabStroke);
+    
     local tabCorner = Instance.new("UICorner");
-    tabCorner.CornerRadius = UDim.new(0, 5);
+    tabCorner.CornerRadius = UDim.new(0, 6);
     tabCorner.Parent = tabContainer;
     
     local contentFrame = Instance.new("Frame");
-    contentFrame.Size = UDim2.new(1, -150, 1, -45);
-    contentFrame.Position = UDim2.new(0, 140, 0, 40);
+    contentFrame.Size = UDim2.new(1, -175, 1, -65);
+    contentFrame.Position = UDim2.new(0, 165, 0, 55);
     contentFrame.BackgroundTransparency = 1;
     contentFrame.Parent = mainFrame;
     
     local tabLayout = Instance.new("UIListLayout");
-    tabLayout.Padding = UDim.new(0, 5);
+    tabLayout.Padding = UDim.new(0, 8);
     tabLayout.Parent = tabContainer;
     
     local tabPadding = Instance.new("UIPadding");
-    tabPadding.PaddingTop = UDim.new(0, 5);
+    tabPadding.PaddingTop = UDim.new(0, 8);
+    tabPadding.PaddingLeft = UDim.new(0, 8);
+    tabPadding.PaddingRight = UDim.new(0, 8);
     tabPadding.Parent = tabContainer;
     
     local leftColumn = Instance.new("ScrollingFrame");
     leftColumn.Size = UDim2.new(0.48, 0, 1, 0);
     leftColumn.BackgroundTransparency = 1;
     leftColumn.BorderSizePixel = 0;
-    leftColumn.ScrollBarThickness = 2;
+    leftColumn.ScrollBarThickness = 3;
     leftColumn.ScrollBarImageColor3 = clrs.pink;
     leftColumn.Parent = contentFrame;
     
@@ -304,7 +327,7 @@ function pnkui:CreateWindow(config)
     rightColumn.Position = UDim2.new(0.52, 0, 0, 0);
     rightColumn.BackgroundTransparency = 1;
     rightColumn.BorderSizePixel = 0;
-    rightColumn.ScrollBarThickness = 2;
+    rightColumn.ScrollBarThickness = 3;
     rightColumn.ScrollBarImageColor3 = clrs.pink;
     rightColumn.Parent = contentFrame;
     
@@ -312,16 +335,24 @@ function pnkui:CreateWindow(config)
     table.insert(uiElements.scrollbars, rightColumn);
     
     local leftLayout = Instance.new("UIListLayout");
-    leftLayout.Padding = UDim.new(0, 10);
+    leftLayout.Padding = UDim.new(0, 12);
     leftLayout.Parent = leftColumn;
     
     local rightLayout = Instance.new("UIListLayout");
-    rightLayout.Padding = UDim.new(0, 10);
+    rightLayout.Padding = UDim.new(0, 12);
     rightLayout.Parent = rightColumn;
     
+    local leftPadding = Instance.new("UIPadding");
+    leftPadding.PaddingTop = UDim.new(0, 5);
+    leftPadding.Parent = leftColumn;
+    
+    local rightPadding = Instance.new("UIPadding");
+    rightPadding.PaddingTop = UDim.new(0, 5);
+    rightPadding.Parent = rightColumn;
+    
     local greetingLabel = Instance.new("TextLabel");
-    greetingLabel.Size = UDim2.new(1, -140, 0, 30);
-    greetingLabel.Position = UDim2.new(0, 10, 1, -35);
+    greetingLabel.Size = UDim2.new(1, -175, 0, 20);
+    greetingLabel.Position = UDim2.new(0, 15, 1, -25);
     greetingLabel.BackgroundTransparency = 1;
     greetingLabel.TextColor3 = clrs.grey;
     greetingLabel.TextSize = 12;
@@ -338,8 +369,8 @@ function pnkui:CreateWindow(config)
         config = config or {};
         
         local tabButton = Instance.new("TextButton");
-        tabButton.Size = UDim2.new(1, -10, 0, 30);
-        tabButton.BackgroundColor3 = clrs.secondary;
+        tabButton.Size = UDim2.new(1, -16, 0, 35);
+        tabButton.BackgroundColor3 = clrs.accent;
         tabButton.BorderSizePixel = 0;
         tabButton.TextTransparency = 1;
         tabButton.Parent = tabContainer;
@@ -347,12 +378,26 @@ function pnkui:CreateWindow(config)
         table.insert(uiElements.tabButtons, tabButton);
         
         local buttonCorner = Instance.new("UICorner");
-        buttonCorner.CornerRadius = UDim.new(0, 5);
+        buttonCorner.CornerRadius = UDim.new(0, 6);
         buttonCorner.Parent = tabButton;
         
+        local tabHover = Instance.new("Frame");
+        tabHover.Size = UDim2.new(0, 3, 1, -10);
+        tabHover.Position = UDim2.new(0, 5, 0, 5);
+        tabHover.BackgroundColor3 = clrs.pink;
+        tabHover.BorderSizePixel = 0;
+        tabHover.BackgroundTransparency = 1;
+        tabHover.Parent = tabButton;
+        
+        table.insert(uiElements.hoverlines, tabHover);
+        
+        local hoverCorner = Instance.new("UICorner");
+        hoverCorner.CornerRadius = UDim.new(0, 2);
+        hoverCorner.Parent = tabHover;
+        
         local tabIcon = Instance.new("TextLabel");
-        tabIcon.Size = UDim2.new(0, 20, 1, 0);
-        tabIcon.Position = UDim2.new(0, 8, 0, 0);
+        tabIcon.Size = UDim2.new(0, 25, 1, 0);
+        tabIcon.Position = UDim2.new(0, 15, 0, 0);
         tabIcon.BackgroundTransparency = 1;
         tabIcon.TextColor3 = clrs.grey;
         tabIcon.TextSize = 16;
@@ -363,12 +408,12 @@ function pnkui:CreateWindow(config)
         table.insert(uiElements.tabIcons, tabIcon);
         
         local tabName = Instance.new("TextLabel");
-        tabName.Size = UDim2.new(1, -35, 1, 0);
-        tabName.Position = UDim2.new(0, 35, 0, 0);
+        tabName.Size = UDim2.new(1, -45, 1, 0);
+        tabName.Position = UDim2.new(0, 45, 0, 0);
         tabName.BackgroundTransparency = 1;
         tabName.TextColor3 = clrs.grey;
         tabName.TextSize = 14;
-        tabName.Font = Enum.Font.Gotham;
+        tabName.Font = Enum.Font.GothamMedium;
         tabName.Text = config.Name or "Tab";
         tabName.TextXAlignment = Enum.TextXAlignment.Left;
         tabName.Parent = tabButton;
@@ -385,14 +430,17 @@ function pnkui:CreateWindow(config)
             if selectedTab then
                 local oldIcon = selectedTab.Button:FindFirstChildOfClass("TextLabel");
                 local oldName = selectedTab.Button:FindFirstChild("TextLabel", 1);
+                local oldHover = selectedTab.Button:FindFirstChild("Frame");
                 
                 tweenserv:Create(oldIcon, TweenInfo.new(0.2), {TextColor3 = clrs.grey}):Play();
                 tweenserv:Create(oldName, TweenInfo.new(0.2), {TextColor3 = clrs.grey}):Play();
+                tweenserv:Create(oldHover, TweenInfo.new(0.2), {BackgroundTransparency = 1}):Play();
                 selectedTab.Content.Visible = false;
             end;
             
             tweenserv:Create(tabIcon, TweenInfo.new(0.2), {TextColor3 = clrs.pink}):Play();
             tweenserv:Create(tabName, TweenInfo.new(0.2), {TextColor3 = clrs.white}):Play();
+            tweenserv:Create(tabHover, TweenInfo.new(0.2), {BackgroundTransparency = 0}):Play();
             tabContent.Visible = true;
             
             selectedTab = tab;
@@ -406,24 +454,26 @@ function pnkui:CreateWindow(config)
             local boxFrame = Instance.new("Frame");
             boxFrame.Size = UDim2.new(1, 0, 0, config.Height or 200);
             boxFrame.BackgroundColor3 = clrs.secondary;
+            boxFrame.BorderSizePixel = 0;
             boxFrame.Parent = config.Column == "right" and rightColumn or leftColumn;
             
             local boxCorner = Instance.new("UICorner");
-            boxCorner.CornerRadius = UDim.new(0, 5);
+            boxCorner.CornerRadius = UDim.new(0, 8);
             boxCorner.Parent = boxFrame;
             
             local boxStroke = Instance.new("UIStroke");
             boxStroke.Color = clrs.pink;
+            boxStroke.Thickness = 1;
             boxStroke.Parent = boxFrame;
             
             table.insert(uiElements.strokes, boxStroke);
             
             local boxTitle = Instance.new("TextLabel");
-            boxTitle.Size = UDim2.new(1, -20, 0, 30);
-            boxTitle.Position = UDim2.new(0, 10, 0, 0);
+            boxTitle.Size = UDim2.new(1, -20, 0, 35);
+            boxTitle.Position = UDim2.new(0, 15, 0, 5);
             boxTitle.BackgroundTransparency = 1;
             boxTitle.TextColor3 = clrs.pink;
-            boxTitle.TextSize = 14;
+            boxTitle.TextSize = 16;
             boxTitle.Font = Enum.Font.GothamBold;
             boxTitle.Text = config.Name or "Box";
             boxTitle.TextXAlignment = Enum.TextXAlignment.Left;
@@ -432,18 +482,18 @@ function pnkui:CreateWindow(config)
             table.insert(uiElements.boxTitles, boxTitle);
             
             local boxContent = Instance.new("ScrollingFrame");
-            boxContent.Size = UDim2.new(1, -20, 1, -40);
-            boxContent.Position = UDim2.new(0, 10, 0, 35);
+            boxContent.Size = UDim2.new(1, -20, 1, -50);
+            boxContent.Position = UDim2.new(0, 10, 0, 45);
             boxContent.BackgroundTransparency = 1;
             boxContent.BorderSizePixel = 0;
-            boxContent.ScrollBarThickness = 2;
+            boxContent.ScrollBarThickness = 3;
             boxContent.ScrollBarImageColor3 = clrs.pink;
             boxContent.Parent = boxFrame;
             
             table.insert(uiElements.scrollbars, boxContent);
             
             local contentLayout = Instance.new("UIListLayout");
-            contentLayout.Padding = UDim.new(0, 5);
+            contentLayout.Padding = UDim.new(0, 8);
             contentLayout.Parent = boxContent;
             
             local contentPadding = Instance.new("UIPadding");
@@ -451,7 +501,7 @@ function pnkui:CreateWindow(config)
             contentPadding.Parent = boxContent;
             
             contentLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-                boxContent.CanvasSize = UDim2.new(0, 0, 0, contentLayout.AbsoluteContentSize.Y + 10);
+                boxContent.CanvasSize = UDim2.new(0, 0, 0, contentLayout.AbsoluteContentSize.Y + 15);
             end);
             
             return boxContent;
@@ -466,7 +516,7 @@ function pnkui:CreateWindow(config)
         end;
         
         tabLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-            tabContainer.CanvasSize = UDim2.new(0, 0, 0, tabLayout.AbsoluteContentSize.Y + 10);
+            tabContainer.CanvasSize = UDim2.new(0, 0, 0, tabLayout.AbsoluteContentSize.Y + 20);
         end);
         
         return tab;
