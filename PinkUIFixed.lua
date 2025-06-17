@@ -8,8 +8,6 @@ local coregui = game:GetService("CoreGui");
 local plr = players.LocalPlayer;
 local mouse = plr:GetMouse();
 
-local GreetingSystem = loadstring(game:HttpGet("https://raw.githubusercontent.com/testing2122/roblox-pink-ui-lib/main/GreetingSystem.lua"))();
-
 local clrs = {
     bg = Color3.fromRGB(6, 6, 8),
     secondary = Color3.fromRGB(12, 12, 15),
@@ -101,11 +99,16 @@ function pnkui:CreateWindow(config)
     config = config or {};
     local window = {};
     
+    local screenGui = Instance.new("ScreenGui");
+    screenGui.Name = "PinkUI";
+    screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling;
+    screenGui.Parent = coregui;
+    
     local mainFrame = Instance.new("Frame");
     mainFrame.Size = UDim2.new(0, 700, 0, 450);
     mainFrame.Position = UDim2.new(0.5, -350, 0.5, -225);
     mainFrame.BackgroundColor3 = clrs.bg;
-    mainFrame.Parent = coregui;
+    mainFrame.Parent = screenGui;
     
     local dragging = false;
     local dragStart = nil;
@@ -249,7 +252,7 @@ function pnkui:CreateWindow(config)
     closeButton.Parent = titleFrame;
     
     closeButton.MouseButton1Click:Connect(function()
-        mainFrame:Destroy();
+        screenGui:Destroy();
     end);
     
     local separator = Instance.new("Frame");
@@ -260,8 +263,8 @@ function pnkui:CreateWindow(config)
     separator.Parent = mainFrame;
     
     local tabContainer = Instance.new("ScrollingFrame");
-    tabContainer.Size = UDim2.new(0, 120, 1, -90);
-    tabContainer.Position = UDim2.new(0, 10, 0, 45);
+    tabContainer.Size = UDim2.new(0, 120, 1, -45);
+    tabContainer.Position = UDim2.new(0, 10, 0, 40);
     tabContainer.BackgroundColor3 = clrs.secondary;
     tabContainer.BorderSizePixel = 0;
     tabContainer.ScrollBarThickness = 2;
@@ -275,8 +278,8 @@ function pnkui:CreateWindow(config)
     tabCorner.Parent = tabContainer;
     
     local contentFrame = Instance.new("Frame");
-    contentFrame.Size = UDim2.new(1, -150, 1, -90);
-    contentFrame.Position = UDim2.new(0, 140, 0, 45);
+    contentFrame.Size = UDim2.new(1, -150, 1, -45);
+    contentFrame.Position = UDim2.new(0, 140, 0, 40);
     contentFrame.BackgroundTransparency = 1;
     contentFrame.Parent = mainFrame;
     
@@ -316,7 +319,16 @@ function pnkui:CreateWindow(config)
     rightLayout.Padding = UDim.new(0, 10);
     rightLayout.Parent = rightColumn;
     
-    GreetingSystem:CreateGreeting(mainFrame);
+    local greetingLabel = Instance.new("TextLabel");
+    greetingLabel.Size = UDim2.new(1, -140, 0, 30);
+    greetingLabel.Position = UDim2.new(0, 10, 1, -35);
+    greetingLabel.BackgroundTransparency = 1;
+    greetingLabel.TextColor3 = clrs.grey;
+    greetingLabel.TextSize = 12;
+    greetingLabel.Font = Enum.Font.Gotham;
+    greetingLabel.Text = "welcome back, " .. plr.Name;
+    greetingLabel.TextXAlignment = Enum.TextXAlignment.Left;
+    greetingLabel.Parent = mainFrame;
     
     local tabs = {};
     local selectedTab = nil;
